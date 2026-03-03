@@ -1,0 +1,984 @@
+[
+  {
+    "category": "Sécurité routière",
+    "exam_level": "official",
+    "difficulty_level": "standard",
+    "weight": 1,
+    "EN": {
+      "question_text": "On which side of the road must vehicles drive in Mauritius?",
+      "option_a": "Right",
+      "option_b": "Left",
+      "option_c": "Center lane",
+      "option_d": "Either side",
+      "correct_option": "B",
+      "explanation": "In Mauritius, vehicles drive on the left-hand side of the road."
+    }
+  },
+  {
+    "category": "Autoroute",
+    "exam_level": "official",
+    "difficulty_level": "standard",
+    "weight": 1,
+    "EN": {
+      "question_text": "What is the maximum speed limit on Mauritian motorways unless otherwise indicated?",
+      "option_a": "80 km/h",
+      "option_b": "90 km/h",
+      "option_c": "100 km/h",
+      "option_d": "110 km/h",
+      "correct_option": "D",
+      "explanation": "The general maximum speed limit on Mauritian motorways is 110 km/h unless signs indicate otherwise."
+    }
+  },
+  {
+    "category": "Sécurité routière",
+    "exam_level": "official",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "Is wearing a seatbelt mandatory for all passengers in a vehicle?",
+      "option_a": "Only for the driver",
+      "option_b": "Only in urban areas",
+      "option_c": "Yes, for all occupants",
+      "option_d": "Only on highways",
+      "correct_option": "C",
+      "explanation": "Seatbelts are mandatory for all occupants in a vehicle in Mauritius."
+    }
+  },
+  {
+    "category": "Sécurité routière",
+    "exam_level": "official",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "Is it permitted to use a mobile phone while driving?",
+      "option_a": "Yes, if traffic is light",
+      "option_b": "Yes, with hands-free",
+      "option_c": "No, it is prohibited",
+      "option_d": "Only outside urban areas",
+      "correct_option": "C",
+      "explanation": "Using a mobile phone while driving is prohibited in Mauritius."
+    }
+  },
+  {
+    "category": "Priorités",
+    "exam_level": "official",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "At an uncontrolled intersection, who has priority?",
+      "option_a": "Vehicle from the left",
+      "option_b": "Vehicle from the right",
+      "option_c": "Largest vehicle",
+      "option_d": "Fastest vehicle",
+      "correct_option": "B",
+      "explanation": "At an uncontrolled intersection, priority is given to the vehicle coming from the right."
+    }
+  },
+  {
+    "category": "Stationnement",
+    "exam_level": "official",
+    "difficulty_level": "standard",
+    "weight": 1,
+    "EN": {
+      "question_text": "Is parking allowed in front of a pedestrian crossing?",
+      "option_a": "Yes, briefly",
+      "option_b": "Yes, if hazard lights are on",
+      "option_c": "No",
+      "option_d": "Only at night",
+      "correct_option": "C",
+      "explanation": "Parking in front of a pedestrian crossing is prohibited as it obstructs visibility."
+    }
+  },
+  {
+    "category": "Autoroute",
+    "exam_level": "official",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "On a motorway, where should slower vehicles position themselves?",
+      "option_a": "Right lane",
+      "option_b": "Left lane",
+      "option_c": "Center lane",
+      "option_d": "Hard shoulder",
+      "correct_option": "B",
+      "explanation": "Since traffic drives on the left in Mauritius, slower vehicles must remain in the left lane."
+    }
+  },
+  {
+    "category": "Infractions & règles générales",
+    "exam_level": "official",
+    "difficulty_level": "standard",
+    "weight": 1,
+    "EN": {
+      "question_text": "What must a driver do when approaching a STOP sign?",
+      "option_a": "Slow down",
+      "option_b": "Sound the horn",
+      "option_c": "Come to a complete stop",
+      "option_d": "Proceed if road seems clear",
+      "correct_option": "C",
+      "explanation": "A STOP sign requires a complete stop before proceeding."
+    }
+  },
+  {
+    "category": "Signalisation",
+    "exam_level": "official",
+    "difficulty_level": "standard",
+    "weight": 1,
+    "EN": {
+      "question_text": "A triangular red-bordered sign generally indicates:",
+      "option_a": "Mandatory action",
+      "option_b": "Warning or danger",
+      "option_c": "Prohibition",
+      "option_d": "Information",
+      "correct_option": "B",
+      "explanation": "Triangular signs with a red border warn of potential hazards."
+    }
+  },
+  {
+    "category": "Sécurité routière",
+    "exam_level": "official",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "What should you do if visibility is reduced due to heavy rain?",
+      "option_a": "Increase speed",
+      "option_b": "Maintain same speed",
+      "option_c": "Reduce speed and increase following distance",
+      "option_d": "Drive on the shoulder",
+      "correct_option": "C",
+      "explanation": "In poor visibility conditions, drivers must reduce speed and increase safety distance."
+    }
+  },
+
+  {
+    "category": "Priorités",
+    "exam_level": "master",
+    "difficulty_level": "major",
+    "weight": 3,
+    "EN": {
+      "question_text": "You approach a roundabout at the same time as another vehicle from your right. Who proceeds first?",
+      "option_a": "You",
+      "option_b": "Vehicle on your right",
+      "option_c": "Largest vehicle",
+      "option_d": "First to accelerate",
+      "correct_option": "B",
+      "explanation": "At roundabouts, vehicles already on or entering from the right generally have priority."
+    }
+  },
+  {
+    "category": "Autoroute",
+    "exam_level": "master",
+    "difficulty_level": "major",
+    "weight": 3,
+    "EN": {
+      "question_text": "A vehicle behind flashes headlights aggressively on the motorway. What is the safest reaction?",
+      "option_a": "Brake suddenly",
+      "option_b": "Accelerate sharply",
+      "option_c": "Maintain control and allow safe overtaking",
+      "option_d": "Ignore and block",
+      "correct_option": "C",
+      "explanation": "The safest action is to remain calm, maintain control and allow safe overtaking."
+    }
+  },
+  {
+    "category": "Sécurité routière",
+    "exam_level": "master",
+    "difficulty_level": "major",
+    "weight": 3,
+    "EN": {
+      "question_text": "You miss your motorway exit. What should you do?",
+      "option_a": "Reverse carefully",
+      "option_b": "Make a U-turn",
+      "option_c": "Continue to the next exit",
+      "option_d": "Use the shoulder",
+      "correct_option": "C",
+      "explanation": "Reversing or turning on a motorway is extremely dangerous and illegal. Continue to the next exit."
+    }
+  },
+  {
+    "category": "Stationnement",
+    "exam_level": "master",
+    "difficulty_level": "critical",
+    "weight": 2,
+    "EN": {
+      "question_text": "You stop briefly on a yellow line to answer a call. Is this permitted?",
+      "option_a": "Yes, if quick",
+      "option_b": "Yes, with hazard lights",
+      "option_c": "No",
+      "option_d": "Only outside peak hours",
+      "correct_option": "C",
+      "explanation": "Stopping on restricted yellow lines is prohibited even briefly."
+    }
+  },
+  {
+    "category": "Infractions & règles générales",
+    "exam_level": "master",
+    "difficulty_level": "major",
+    "weight": 3,
+    "EN": {
+      "question_text": "You approach a pedestrian already crossing at a zebra crossing. What must you do?",
+      "option_a": "Honk to warn",
+      "option_b": "Slow slightly",
+      "option_c": "Stop and give way",
+      "option_d": "Pass if space available",
+      "correct_option": "C",
+      "explanation": "Drivers must stop and give way to pedestrians already crossing."
+    }
+  },
+  {
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a triangular road sign with a red border usually indicate?",
+    "option_a": "Mandatory action",
+    "option_b": "Warning or danger",
+    "option_c": "Parking zone",
+    "option_d": "Highway entrance",
+    "correct_option": "B",
+    "explanation": "Triangular signs with a red border warn drivers of potential hazards ahead."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What must you do when you see a STOP sign?",
+    "option_a": "Slow down and proceed if clear",
+    "option_b": "Stop only if traffic is coming",
+    "option_c": "Come to a complete stop",
+    "option_d": "Honk before proceeding",
+    "correct_option": "C",
+    "explanation": "A STOP sign requires a complete stop regardless of traffic conditions."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "A circular sign with a red border generally means:",
+    "option_a": "Warning",
+    "option_b": "Prohibition",
+    "option_c": "Direction",
+    "option_d": "Information",
+    "correct_option": "B",
+    "explanation": "Circular signs with red borders indicate prohibitions."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a blue circular sign typically indicate?",
+    "option_a": "Prohibited action",
+    "option_b": "Danger ahead",
+    "option_c": "Mandatory instruction",
+    "option_d": "Tourist information",
+    "correct_option": "C",
+    "explanation": "Blue circular signs usually indicate mandatory instructions."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What should you do when approaching a pedestrian crossing with people waiting?",
+    "option_a": "Slow down only",
+    "option_b": "Stop and give way",
+    "option_c": "Honk to alert them",
+    "option_d": "Continue if no one is crossing yet",
+    "correct_option": "B",
+    "explanation": "Drivers must stop and give way to pedestrians at zebra crossings."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A red traffic light means:",
+    "option_a": "Slow down",
+    "option_b": "Proceed with caution",
+    "option_c": "Stop",
+    "option_d": "Turn only",
+    "correct_option": "C",
+    "explanation": "A red traffic light requires drivers to stop."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a flashing amber traffic light usually mean?",
+    "option_a": "Stop immediately",
+    "option_b": "Proceed with caution",
+    "option_c": "Speed up",
+    "option_d": "Road closed",
+    "correct_option": "B",
+    "explanation": "A flashing amber light indicates drivers should proceed with caution."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What does a 'No Entry' sign indicate?",
+    "option_a": "No parking",
+    "option_b": "No overtaking",
+    "option_c": "Vehicles must not enter",
+    "option_d": "Pedestrians only",
+    "correct_option": "C",
+    "explanation": "A 'No Entry' sign means vehicles are not allowed to enter that road."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A sign showing children crossing warns drivers to:",
+    "option_a": "Increase speed",
+    "option_b": "Expect a school zone",
+    "option_c": "Stop permanently",
+    "option_d": "Ignore pedestrians",
+    "correct_option": "B",
+    "explanation": "This sign warns drivers to expect children and drive cautiously."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a solid white line in the center of the road usually indicate?",
+    "option_a": "Overtaking allowed",
+    "option_b": "No lane marking",
+    "option_c": "Overtaking prohibited",
+    "option_d": "Pedestrian zone",
+    "correct_option": "C",
+    "explanation": "A solid white center line generally indicates that overtaking is prohibited."
+  }
+},
+
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A yellow box junction marking means you must:",
+    "option_a": "Stop inside the box",
+    "option_b": "Enter only if your exit is clear",
+    "option_c": "Park briefly",
+    "option_d": "Turn immediately",
+    "correct_option": "B",
+    "explanation": "You must not enter a yellow box junction unless your exit is clear."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What does a 'Give Way' sign require you to do?",
+    "option_a": "Stop completely",
+    "option_b": "Slow down and yield if necessary",
+    "option_c": "Continue without slowing",
+    "option_d": "Honk before proceeding",
+    "correct_option": "B",
+    "explanation": "A 'Give Way' sign requires drivers to slow down and yield to traffic on the main road."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A broken white line in the center of the road indicates:",
+    "option_a": "Overtaking is permitted if safe",
+    "option_b": "Overtaking is prohibited",
+    "option_c": "Road closed",
+    "option_d": "Pedestrian crossing ahead",
+    "correct_option": "A",
+    "explanation": "A broken white line allows overtaking when it is safe to do so."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a speed limit sign with a red circle indicate?",
+    "option_a": "Minimum speed",
+    "option_b": "Advisory speed",
+    "option_c": "Maximum permitted speed",
+    "option_d": "Recommended speed",
+    "correct_option": "C",
+    "explanation": "A red circular speed sign indicates the maximum legal speed."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "If traffic lights are not working, what should drivers do?",
+    "option_a": "Ignore the junction",
+    "option_b": "Treat it as an uncontrolled intersection",
+    "option_c": "Speed up to pass quickly",
+    "option_d": "Follow pedestrians only",
+    "correct_option": "B",
+    "explanation": "If traffic lights fail, drivers must treat the junction as uncontrolled and proceed with caution."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a road sign with a red circle and a number inside mean?",
+    "option_a": "Minimum speed required",
+    "option_b": "Maximum speed limit",
+    "option_c": "Number of lanes",
+    "option_d": "Distance to next town",
+    "correct_option": "B",
+    "explanation": "A red circle with a number indicates the maximum legal speed."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a road marking with zigzag lines near a crossing mean?",
+    "option_a": "Parking allowed briefly",
+    "option_b": "No stopping or parking",
+    "option_c": "Bus stop",
+    "option_d": "Loading zone",
+    "correct_option": "B",
+    "explanation": "Zigzag road markings near crossings prohibit stopping or parking."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What must you do when a police officer directs traffic contrary to traffic lights?",
+    "option_a": "Follow traffic lights",
+    "option_b": "Ignore the officer",
+    "option_c": "Follow the officer's instructions",
+    "option_d": "Stop permanently",
+    "correct_option": "C",
+    "explanation": "A police officer's directions override traffic lights and road signs."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A blue rectangular sign usually provides:",
+    "option_a": "Warning",
+    "option_b": "Mandatory instruction",
+    "option_c": "Information",
+    "option_d": "Prohibition",
+    "correct_option": "C",
+    "explanation": "Blue rectangular signs typically provide information to drivers."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a road sign showing a winding road indicate?",
+    "option_a": "Road closed",
+    "option_b": "Slippery surface",
+    "option_c": "Series of bends ahead",
+    "option_d": "Tunnel ahead",
+    "correct_option": "C",
+    "explanation": "This warning sign indicates a series of bends ahead."
+  }
+},
+
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a sign indicating a steep hill downward warn drivers about?",
+    "option_a": "Sharp turn ahead",
+    "option_b": "Steep descent",
+    "option_c": "Slippery road",
+    "option_d": "Road narrowing",
+    "correct_option": "B",
+    "explanation": "This warning sign alerts drivers to a steep descent ahead."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "When approaching a railway crossing without barriers, what must you do?",
+    "option_a": "Speed up to cross quickly",
+    "option_b": "Proceed without slowing",
+    "option_c": "Slow down and be prepared to stop",
+    "option_d": "Stop permanently",
+    "correct_option": "C",
+    "explanation": "Drivers must slow down and be ready to stop at railway crossings without barriers."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a road sign with a red circle and a diagonal line across it mean?",
+    "option_a": "Mandatory action",
+    "option_b": "Warning",
+    "option_c": "Prohibited action",
+    "option_d": "Information only",
+    "correct_option": "C",
+    "explanation": "A red circle with a diagonal line indicates that the displayed action is prohibited."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "You see a sign indicating road works ahead. What should you do?",
+    "option_a": "Maintain speed",
+    "option_b": "Increase speed",
+    "option_c": "Slow down and follow temporary signs",
+    "option_d": "Ignore it",
+    "correct_option": "C",
+    "explanation": "Road works signs require drivers to slow down and follow temporary instructions."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "What must you do if you see a flashing red light at a level crossing?",
+    "option_a": "Proceed if no train is visible",
+    "option_b": "Stop immediately",
+    "option_c": "Slow down only",
+    "option_d": "Sound the horn and continue",
+    "correct_option": "B",
+    "explanation": "Flashing red lights at a level crossing require drivers to stop immediately."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a sign showing two opposite arrows usually indicate?",
+    "option_a": "Two-way traffic",
+    "option_b": "One-way road",
+    "option_c": "No overtaking",
+    "option_d": "Dead end",
+    "correct_option": "A",
+    "explanation": "Two opposite arrows indicate a two-way traffic road."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "A sign indicating a narrowing road warns drivers to:",
+    "option_a": "Speed up",
+    "option_b": "Prepare for reduced road width",
+    "option_c": "Turn around",
+    "option_d": "Stop permanently",
+    "correct_option": "B",
+    "explanation": "This sign warns that the road ahead becomes narrower."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "If a temporary road sign conflicts with a permanent sign, which should you follow?",
+    "option_a": "Permanent sign",
+    "option_b": "Temporary sign",
+    "option_c": "Traffic lights only",
+    "option_d": "Ignore both",
+    "correct_option": "B",
+    "explanation": "Temporary signs take precedence over permanent signs during road works or special conditions."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What does a sign with a red border and a truck symbol often indicate?",
+    "option_a": "Trucks only",
+    "option_b": "Truck parking",
+    "option_c": "No heavy vehicles",
+    "option_d": "Fuel station",
+    "correct_option": "C",
+    "explanation": "A red-bordered sign with a truck symbol usually prohibits heavy vehicles."
+  }
+},
+{
+  "category": "Signalisation",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "What should you expect when you see a slippery road warning sign?",
+    "option_a": "Loose gravel",
+    "option_b": "Reduced traction conditions",
+    "option_c": "Road closed",
+    "option_d": "Pedestrian zone",
+    "correct_option": "B",
+    "explanation": "The slippery road sign warns drivers that traction may be reduced."
+  }
+},
+
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "At an uncontrolled intersection, a vehicle approaches from your right. What must you do?",
+    "option_a": "Proceed first",
+    "option_b": "Speed up",
+    "option_c": "Give way",
+    "option_d": "Honk and continue",
+    "correct_option": "C",
+    "explanation": "At an uncontrolled intersection, you must give priority to vehicles coming from your right."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "You are turning right at an intersection while another vehicle is going straight from the opposite direction. Who has priority?",
+    "option_a": "You",
+    "option_b": "The vehicle going straight",
+    "option_c": "Largest vehicle",
+    "option_d": "Fastest vehicle",
+    "correct_option": "B",
+    "explanation": "Vehicles going straight generally have priority over vehicles turning."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "You are exiting a parking space onto the road. Who has priority?",
+    "option_a": "You",
+    "option_b": "Vehicles already on the road",
+    "option_c": "Pedestrians only",
+    "option_d": "No one",
+    "correct_option": "B",
+    "explanation": "Vehicles already on the road have priority over vehicles entering from parking areas."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "When approaching a 'Give Way' sign, you must:",
+    "option_a": "Stop always",
+    "option_b": "Yield to traffic on the main road",
+    "option_c": "Ignore if road is empty",
+    "option_d": "Honk before entering",
+    "correct_option": "B",
+    "explanation": "A 'Give Way' sign requires drivers to yield to traffic on the main road."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "At a roundabout, who has priority?",
+    "option_a": "Vehicles entering",
+    "option_b": "Vehicles already circulating",
+    "option_c": "Largest vehicle",
+    "option_d": "Fastest vehicle",
+    "correct_option": "B",
+    "explanation": "Vehicles already circulating in a roundabout have priority."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "You approach a pedestrian already crossing the road. What must you do?",
+    "option_a": "Honk",
+    "option_b": "Continue slowly",
+    "option_c": "Stop and give way",
+    "option_d": "Pass behind them",
+    "correct_option": "C",
+    "explanation": "Drivers must stop and give way to pedestrians already crossing."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "An emergency vehicle with flashing lights approaches from behind. What must you do?",
+    "option_a": "Maintain speed",
+    "option_b": "Block its path",
+    "option_c": "Give way safely",
+    "option_d": "Speed up",
+    "correct_option": "C",
+    "explanation": "Drivers must give way safely to emergency vehicles using flashing lights."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "You are on a minor road approaching a main road without traffic lights. Who has priority?",
+    "option_a": "You",
+    "option_b": "Vehicles on the main road",
+    "option_c": "Pedestrians only",
+    "option_d": "Largest vehicle",
+    "correct_option": "B",
+    "explanation": "Vehicles on the main road have priority over those on minor roads."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "critical",
+  "weight": 2,
+  "EN": {
+    "question_text": "Two vehicles arrive at an uncontrolled intersection at the same time. One is on your right. Who proceeds first?",
+    "option_a": "You",
+    "option_b": "Vehicle on your right",
+    "option_c": "Largest vehicle",
+    "option_d": "Vehicle turning left",
+    "correct_option": "B",
+    "explanation": "At uncontrolled intersections, priority is given to the vehicle coming from the right."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "official",
+  "difficulty_level": "standard",
+  "weight": 1,
+  "EN": {
+    "question_text": "When turning left, you must give way to:",
+    "option_a": "No one",
+    "option_b": "Oncoming traffic going straight",
+    "option_c": "Vehicles behind you",
+    "option_d": "Parked vehicles",
+    "correct_option": "B",
+    "explanation": "When turning left, you must give way to oncoming traffic going straight."
+  }
+},
+
+{
+  "category": "Priorités",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "You approach an uncontrolled intersection at the same time as two other vehicles: one from your right and one opposite you turning left. Who has priority?",
+    "option_a": "You",
+    "option_b": "Vehicle on your right",
+    "option_c": "Vehicle turning left",
+    "option_d": "Largest vehicle",
+    "correct_option": "B",
+    "explanation": "At uncontrolled intersections, priority is given to the vehicle coming from the right, regardless of turning direction."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "You are turning right at a junction while a pedestrian begins crossing on your intended path. What must you do?",
+    "option_a": "Complete your turn quickly",
+    "option_b": "Sound your horn",
+    "option_c": "Stop and give way to the pedestrian",
+    "option_d": "Continue if you have started turning",
+    "correct_option": "C",
+    "explanation": "Pedestrians crossing the road have priority, even if you have already begun turning."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "master",
+  "difficulty_level": "critical",
+  "weight": 3,
+  "EN": {
+    "question_text": "At a roundabout, you signal to exit but a vehicle attempts to enter from your left assuming you are leaving. Who has priority?",
+    "option_a": "The entering vehicle",
+    "option_b": "You, while still circulating",
+    "option_c": "Largest vehicle",
+    "option_d": "Fastest vehicle",
+    "correct_option": "B",
+    "explanation": "Vehicles already circulating in a roundabout retain priority until they have fully exited."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "You exit a private driveway onto a main road while a cyclist approaches from your right. Who has priority?",
+    "option_a": "You",
+    "option_b": "The cyclist",
+    "option_c": "Whoever arrives first",
+    "option_d": "Largest vehicle",
+    "correct_option": "B",
+    "explanation": "All road users already on the road, including cyclists, have priority over vehicles exiting private property."
+  }
+},
+{
+  "category": "Priorités",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "Traffic lights are green for you, but the intersection is blocked by vehicles ahead. What should you do?",
+    "option_a": "Enter the intersection anyway",
+    "option_b": "Sound your horn",
+    "option_c": "Wait until your exit path is clear",
+    "option_d": "Drive onto the shoulder",
+    "correct_option": "C",
+    "explanation": "Even with a green light, you must not enter an intersection unless your exit is clear."
+  }
+},
+
+{
+  "category": "Ronds-points",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "You approach a roundabout intending to go straight. A vehicle inside the roundabout signals incorrectly but continues circulating. What should you do?",
+    "option_a": "Enter because it is signaling to exit",
+    "option_b": "Accelerate to pass before it",
+    "option_c": "Wait until it clearly exits",
+    "option_d": "Sound your horn and proceed",
+    "correct_option": "C",
+    "explanation": "Drivers must rely on vehicle movement, not only signals. Wait until the vehicle has clearly exited."
+  }
+},
+{
+  "category": "Ronds-points",
+  "exam_level": "master",
+  "difficulty_level": "critical",
+  "weight": 3,
+  "EN": {
+    "question_text": "Two vehicles are circulating side by side in a multi-lane roundabout. You want to exit from the inner lane. What must you ensure first?",
+    "option_a": "You have signaled",
+    "option_b": "The outer lane is clear",
+    "option_c": "You accelerate quickly",
+    "option_d": "You sound your horn",
+    "correct_option": "B",
+    "explanation": "Before exiting from an inner lane, you must ensure the outer lane is clear to avoid collision."
+  }
+},
+{
+  "category": "Ronds-points",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "A pedestrian begins crossing at the exit of a roundabout as you are exiting. Who has priority?",
+    "option_a": "You",
+    "option_b": "The pedestrian",
+    "option_c": "Largest vehicle",
+    "option_d": "Whoever moves first",
+    "correct_option": "B",
+    "explanation": "Pedestrians crossing at designated areas have priority, even when you are exiting a roundabout."
+  }
+},
+{
+  "category": "Ronds-points",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "You are already inside a roundabout when an emergency vehicle with flashing lights approaches from behind. What should you do?",
+    "option_a": "Stop immediately inside the roundabout",
+    "option_b": "Maintain your lane and exit safely, then give way",
+    "option_c": "Accelerate to block others",
+    "option_d": "Reverse",
+    "correct_option": "B",
+    "explanation": "Do not stop abruptly inside a roundabout. Exit safely first, then give way."
+  }
+},
+{
+  "category": "Ronds-points",
+  "exam_level": "master",
+  "difficulty_level": "major",
+  "weight": 3,
+  "EN": {
+    "question_text": "A heavy vehicle occupies most of the outer lane in a roundabout. You are in the inner lane intending to exit. What is the safest action?",
+    "option_a": "Force your way out",
+    "option_b": "Exit without checking",
+    "option_c": "Continue circulating until safe to exit",
+    "option_d": "Stop inside the roundabout",
+    "correct_option": "C",
+    "explanation": "If the exit is unsafe, continue circulating until a safe opportunity appears."
+  }
+}
+
+]
