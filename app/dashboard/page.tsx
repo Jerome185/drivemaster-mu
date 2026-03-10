@@ -66,6 +66,12 @@ export default async function DashboardPage() {
         })) || []
         }
         />
+        <a
+        href="/learning"
+        className="bg-green-600 text-white px-4 py-2 rounded"
+        >
+        Learning Mode
+        </a>
 
         <h2 className="text-xl font-semibold mb-4">Recent Attempts</h2>
 
