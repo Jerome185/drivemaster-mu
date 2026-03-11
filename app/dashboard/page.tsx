@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
 import ProgressChart from "@/components/ProgressChart"
+import Link from "next/link"
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -52,53 +53,69 @@ export default async function DashboardPage() {
         Your Performance Dashboard 📊
       </h1>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-10">
+      {/* Stats */}
+      <div className="grid md:grid-cols-4 gap-6 mb-10">
         <Card title="Total Exams" value={total} />
         <Card title="Passed" value={passed} />
         <Card title="Average Score" value={`${avg}%`} />
-      </div>
 
-        <ProgressChart
-            data={
-            attempts?.map((a, i) => ({
-            index: i + 1,
-            percentage: a.percentage
-        })) || []
-        }
-        />
-        <a
-        href="/learning"
-        className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-        Learning Mode
-        </a>
-
-        <h2 className="text-xl font-semibold mb-4">Recent Attempts</h2>
-
-      <div className="space-y-3">
-        {attempts?.map(a => (
-          <div
-            key={a.id}
-            className="flex justify-between border p-4 rounded-lg shadow-sm"
-          >
-            <div>
-              <div className="font-semibold uppercase">
-                {a.exam_level}
-              </div>
-              <div className="text-sm text-gray-500">
-                {new Date(a.created_at).toLocaleString()}
-              </div>
-            </div>
-
-            <div
-              className={`font-bold ${
-                a.passed ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {a.percentage}% {a.passed ? "✅" : "❌"}
+        <Link href="/learning">
+          <div className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-xl shadow-md text-center cursor-pointer transition">
+            <div className="text-lg font-semibold">Learning Mode</div>
+            <div className="text-sm opacity-80 mt-1">
+              Practice road signs
             </div>
           </div>
-        ))}
+        </Link>
+      </div>
+
+      {/* Progress Chart */}
+      <div className="bg-white p-6 rounded-xl shadow-md mb-10">
+        <h2 className="text-xl font-semibold mb-4">
+          Score Progression
+        </h2>
+
+        <ProgressChart
+          data={
+            attempts?.map((a, i) => ({
+              index: i + 1,
+              percentage: a.percentage
+            })) || []
+          }
+        />
+      </div>
+
+      {/* Recent Attempts */}
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-xl font-semibold mb-4">
+          Recent Attempts
+        </h2>
+
+        <div className="space-y-3">
+          {attempts?.map(a => (
+            <div
+              key={a.id}
+              className="flex justify-between border p-4 rounded-lg"
+            >
+              <div>
+                <div className="font-semibold uppercase">
+                  {a.exam_level}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {new Date(a.created_at).toLocaleString()}
+                </div>
+              </div>
+
+              <div
+                className={`font-bold ${
+                  a.passed ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {a.percentage}% {a.passed ? "✅" : "❌"}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   )
