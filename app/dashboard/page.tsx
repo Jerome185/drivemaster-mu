@@ -5,7 +5,7 @@ import ProgressChart from "@/components/ProgressChart"
 import Link from "next/link"
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies()
+  const cookieStore = cookies()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,20 +25,24 @@ export default async function DashboardPage() {
     }
   )
 
+  // 🔐 Vérifier utilisateur
   const {
     data: { user }
   } = await supabase.auth.getUser()
 
   if (!user) redirect("/login")
 
+  // 📊 Récupérer les tentatives
   const { data: attempts } = await supabase
     .from("exam_attempts")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
+  // 📊 Stats
   const total = attempts?.length || 0
   const passed = attempts?.filter(a => a.passed).length || 0
+
   const avg =
     attempts && attempts.length > 0
       ? Math.round(
@@ -46,6 +50,12 @@ export default async function DashboardPage() {
             attempts.length
         )
       : 0
+
+  // ⚠️ Weak Areas
+  const { data: weakAreas } = await supabase
+    .rpc("get_user_weak_categories", {
+      user_id_input: user.id
+    })
 
   return (
     <main className="p-8 max-w-5xl mx-auto">
@@ -61,9 +71,11 @@ export default async function DashboardPage() {
 
         <Link href="/learning">
           <div className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-xl shadow-md text-center cursor-pointer transition">
-            <div className="text-lg font-semibold">Learning Mode</div>
+            <div className="text-lg font-semibold">
+              Learning Mode
+            </div>
             <div className="text-sm opacity-80 mt-1">
-              Practice road signs
+              Practice weak areas
             </div>
           </div>
         </Link>
@@ -85,6 +97,36 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* Weak Areas */}
+      <div className="bg-white p-6 rounded-xl shadow-md mb-10">
+        <h2 className="text-xl font-semibold mb-4">
+          Weak Areas ⚠️
+        </h2>
+
+        {(!weakAreas || weakAreas.length === 0) && (
+          <p className="text-gray-500">
+            No weak areas detected yet. Keep practicing!
+          </p>
+        )}
+
+        <div className="space-y-3">
+          {weakAreas?.map((area: any) => (
+            <div
+              key={area.category_name}
+              className="flex justify-between border p-3 rounded-lg"
+            >
+              <span className="font-medium">
+                {area.category_name}
+              </span>
+
+              <span className="text-red-600 font-bold">
+                {area.mistakes} mistakes
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Recent Attempts */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-4">
@@ -101,6 +143,7 @@ export default async function DashboardPage() {
                 <div className="font-semibold uppercase">
                   {a.exam_level}
                 </div>
+
                 <div className="text-sm text-gray-500">
                   {new Date(a.created_at).toLocaleString()}
                 </div>
@@ -121,11 +164,22 @@ export default async function DashboardPage() {
   )
 }
 
-function Card({ title, value }: { title: string; value: any }) {
+function Card({
+  title,
+  value
+}: {
+  title: string
+  value: any
+}) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-center">
-      <div className="text-gray-500 mb-2">{title}</div>
-      <div className="text-3xl font-bold text-blue-700">{value}</div>
+      <div className="text-gray-500 mb-2">
+        {title}
+      </div>
+
+      <div className="text-3xl font-bold text-blue-700">
+        {value}
+      </div>
     </div>
   )
 }
