@@ -46,6 +46,7 @@ const timePerQuestion = isMaster ? 30 : 60
 const [timeLeft, setTimeLeft] = useState(timePerQuestion)
 
 const currentQuestion = questions[currentIndex]
+const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5)
 
 const totalPossibleScore = questions.reduce(
 (sum, q) => sum + q.weight,

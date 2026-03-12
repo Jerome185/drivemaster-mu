@@ -1,25 +1,44 @@
-import { supabase } from "@/lib/supabase"
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import Exam from "@/components/Exam"
 
 export default async function MasterPage() {
-  const { data, error } = await supabase.rpc("get_master_exam_questions")
 
-  if (error || !data) {
-    return (
-      <main className="p-8">
-        <h1>DriveMaster MU 🚗</h1>
-        <p>Error loading Master exam.</p>
-      </main>
-    )
-  }
+const cookieStore = cookies()
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-white p-8">
-      <h1 className="text-3xl font-bold text-red-700 mb-8">
-        Master Ready Mode 🔥
-      </h1>
+const supabase = createServerClient(
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+{
+cookies:{
+get(name:string){
+return cookieStore.get(name)?.value
+},
+set(){},
+remove(){}
+}
+}
+)
 
-      <Exam questions={data} isMaster />
-    </main>
-  )
+const { data:{ user } } = await supabase.auth.getUser()
+
+if(!user){
+redirect("/login")
+}
+
+const { data: questions } = await supabase.rpc(
+"generate_exam_questions"
+)
+
+return(
+
+<div className="flex justify-center p-8">
+
+<Exam questions={questions || []} isMaster />
+
+</div>
+
+)
+
 }
