@@ -1,27 +1,19 @@
 import "./globals.css"
-import Header from "@/components/Header"
 import Navbar from "@/components/Navbar"
 
 export default function RootLayout({
-children,
+  children,
 }: {
-children: React.ReactNode
+  children: React.ReactNode
 }) {
-
-return (
-
-<html lang="en">
-
-<body>
-
-<Navbar />
-
-{children}
-
-</body>
-
-</html>
-
-)
-
+  return (
+    <html lang="en">
+      <body className="min-h-screen bg-white">
+        <Navbar />
+        <main>
+          {children}
+        </main>
+      </body>
+    </html>
+  )
 }
