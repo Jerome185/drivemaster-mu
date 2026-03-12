@@ -11,14 +11,65 @@ process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export default function LearningPage() {
 
 const [lang, setLang] = useState("EN")
-const [category, setCategory] = useState("Signalisation")
+const [categories, setCategories] = useState<any[]>([])
+const [category, setCategory] = useState("")
 
 const [question, setQuestion] = useState<any>(null)
 const [selected, setSelected] = useState<string | null>(null)
 const [showResult, setShowResult] = useState(false)
 const [loading, setLoading] = useState(false)
 
+
+// LOAD LANGUAGE FROM NAVBAR
+
+useEffect(()=>{
+
+const savedLang = localStorage.getItem("lang")
+
+if(savedLang){
+setLang(savedLang)
+}
+
+const handleLangChange = (e:any)=>{
+setLang(e.detail)
+}
+
+window.addEventListener("languageChange", handleLangChange)
+
+return ()=>{
+window.removeEventListener("languageChange", handleLangChange)
+}
+
+},[])
+
+
+// LOAD CATEGORIES
+
+const loadCategories = async () => {
+
+const { data } = await supabase.rpc(
+"get_categories_by_language",
+{ lang }
+)
+
+if(data){
+
+setCategories(data)
+
+if(data.length > 0){
+setCategory(data[0].name)
+}
+
+}
+
+}
+
+
+// LOAD QUESTION
+
 const loadQuestion = async () => {
+
+if(!category) return
 
 setLoading(true)
 
@@ -42,9 +93,22 @@ setLoading(false)
 
 }
 
+
+// LOAD CATEGORIES WHEN LANGUAGE CHANGES
+
+useEffect(()=>{
+loadCategories()
+},[lang])
+
+
+// LOAD QUESTION WHEN CATEGORY CHANGES
+
 useEffect(()=>{
 loadQuestion()
-},[lang])
+},[category])
+
+
+// HANDLE ANSWER
 
 const handleSelect = (option: string) => {
 
@@ -54,6 +118,9 @@ setSelected(option)
 setShowResult(true)
 
 }
+
+
+// BUTTON STYLE
 
 const getButtonStyle = (letter:string) => {
 
@@ -69,6 +136,9 @@ return "border opacity-50"
 
 }
 
+
+// UI
+
 return (
 
 <div className="max-w-xl mx-auto p-8">
@@ -77,20 +147,10 @@ return (
 Learning Mode 🧠
 </h1>
 
-{/* LANGUAGE + CATEGORY */}
+
+{/* CATEGORY SELECTOR */}
 
 <div className="flex gap-3 mb-6">
-
-<select
-className="border p-2 rounded"
-value={lang}
-onChange={(e)=>setLang(e.target.value)}
->
-
-<option value="EN">English</option>
-<option value="FR">Français</option>
-
-</select>
 
 <select
 className="border p-2 rounded"
@@ -98,10 +158,11 @@ value={category}
 onChange={(e)=>setCategory(e.target.value)}
 >
 
-<option>Signalisation</option>
-<option>Priorités</option>
-<option>Ronds-points</option>
-<option>Sécurité routière</option>
+{categories.map((c)=>(
+<option key={c.id} value={c.name}>
+{c.name}
+</option>
+))}
 
 </select>
 
@@ -116,6 +177,7 @@ New Question
 
 </div>
 
+
 {/* LOADING */}
 
 {loading && (
@@ -125,6 +187,7 @@ Loading question...
 </p>
 
 )}
+
 
 {/* QUESTION */}
 
