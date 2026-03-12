@@ -12,6 +12,34 @@ const savedLang = localStorage.getItem("lang")
 if (savedLang) setLang(savedLang)
 }, [])
 
+const [streak, setStreak] = useState(0)
+
+useEffect(()=>{
+
+const loadStreak = async () => {
+
+const { data:userData } = await supabase.auth.getUser()
+
+if(!userData?.user) return
+
+const { data } = await supabase
+.from("practice_streaks")
+.select("streak_count")
+.eq("user_id", userData.user.id)
+.single()
+
+if(data){
+setStreak(data.streak_count)
+}
+
+}
+
+loadStreak()
+
+},[])
+
+
+
 const changeLanguage = (newLang:string) => {
 
 setLang(newLang)
@@ -62,6 +90,10 @@ value={lang}
 onChange={(e)=>changeLanguage(e.target.value)}
 className="border rounded px-2 py-1"
 >
+
+<div className="flex items-center gap-2 text-orange-600 font-semibold">
+🔥 {streak}
+</div>
 
 <option value="EN">EN</option>
 <option value="FR">FR</option>

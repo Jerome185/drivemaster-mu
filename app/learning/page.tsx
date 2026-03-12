@@ -118,7 +118,16 @@ setSelected(option)
 setShowResult(true)
 
 }
+const { data:userData } = await supabase.auth.getUser()
 
+if(userData?.user){
+
+await supabase.rpc(
+"update_practice_streak",
+{ user_id_input: userData.user.id }
+)
+
+}
 
 // BUTTON STYLE
 

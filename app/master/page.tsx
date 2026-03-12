@@ -28,7 +28,7 @@ redirect("/login")
 }
 
 const { data: questions } = await supabase.rpc(
-"generate_exam_questions"
+"generate_master_exam_questions"
 )
 
 return(
