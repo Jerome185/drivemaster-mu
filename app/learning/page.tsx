@@ -1,7 +1,7 @@
 "use client"
 
 import { createBrowserClient } from "@supabase/ssr"
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 
 const supabase = createBrowserClient(
 process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,7 +10,9 @@ process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export default function LearningPage() {
 
+const [lang, setLang] = useState("EN")
 const [category, setCategory] = useState("Signalisation")
+
 const [question, setQuestion] = useState<any>(null)
 const [selected, setSelected] = useState<string | null>(null)
 const [showResult, setShowResult] = useState(false)
@@ -21,17 +23,19 @@ const loadQuestion = async () => {
 setLoading(true)
 
 const { data } = await supabase.rpc(
-"get_adaptive_learning_questions",
+"get_learning_question",
 {
 category_name_input: category,
-lang: "EN"
+lang
 }
 )
 
 if (data && data.length > 0) {
+
 setQuestion(data[0])
 setSelected(null)
 setShowResult(false)
+
 }
 
 setLoading(false)
@@ -40,7 +44,7 @@ setLoading(false)
 
 useEffect(()=>{
 loadQuestion()
-},[category])
+},[lang])
 
 const handleSelect = (option: string) => {
 
@@ -73,7 +77,20 @@ return (
 Learning Mode 🧠
 </h1>
 
+{/* LANGUAGE + CATEGORY */}
+
 <div className="flex gap-3 mb-6">
+
+<select
+className="border p-2 rounded"
+value={lang}
+onChange={(e)=>setLang(e.target.value)}
+>
+
+<option value="EN">English</option>
+<option value="FR">Français</option>
+
+</select>
 
 <select
 className="border p-2 rounded"
@@ -99,6 +116,8 @@ New Question
 
 </div>
 
+{/* LOADING */}
+
 {loading && (
 
 <p className="text-gray-500">
@@ -106,6 +125,8 @@ Loading question...
 </p>
 
 )}
+
+{/* QUESTION */}
 
 {question && !loading && (
 
