@@ -110,7 +110,7 @@ loadQuestion()
 
 // HANDLE ANSWER
 
-const handleSelect = (option: string) => {
+const handleSelect = async (option: string) => {
 
 if (showResult) return
 
