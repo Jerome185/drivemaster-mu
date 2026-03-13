@@ -1,111 +1,117 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { createBrowserClient } from "@supabase/ssr"
+import { useEffect, useState } from "react"
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function Navbar() {
 
-const [lang, setLang] = useState("EN")
+  const router = useRouter()
 
-useEffect(() => {
-const savedLang = localStorage.getItem("lang")
-if (savedLang) setLang(savedLang)
-}, [])
+  const [user,setUser] = useState<any>(null)
+  const [language,setLanguage] = useState("EN")
 
-const [streak, setStreak] = useState(0)
+  useEffect(()=>{
 
-useEffect(()=>{
+    const getUser = async ()=>{
 
-const loadStreak = async () => {
+      const { data } = await supabase.auth.getUser()
 
-const { data:userData } = await supabase.auth.getUser()
+      setUser(data.user)
 
-if(!userData?.user) return
+    }
 
-const { data } = await supabase
-.from("practice_streaks")
-.select("streak_count")
-.eq("user_id", userData.user.id)
-.single()
+    getUser()
 
-if(data){
-setStreak(data.streak_count)
-}
+  },[])
 
-}
+  const handleLogout = async ()=>{
 
-loadStreak()
+    await supabase.auth.signOut()
 
-},[])
+    router.push("/login")
 
+  }
 
+  return (
 
-const changeLanguage = (newLang:string) => {
+    <nav className="flex items-center justify-between px-6 py-4 border-b bg-white">
 
-setLang(newLang)
-localStorage.setItem("lang", newLang)
+      {/* Logo */}
 
-window.dispatchEvent(
-new CustomEvent("languageChange", { detail: newLang })
-)
+      <Link
+        href="/"
+        className="text-xl font-bold text-blue-700"
+      >
+        DriveMaster MU 🚗
+      </Link>
 
-}
+      {/* Navigation */}
 
-return (
+      <div className="flex items-center gap-6">
 
-<nav className="w-full bg-white border-b shadow-sm">
+        <Link
+          href="/dashboard"
+          className="hover:text-blue-600"
+        >
+          Dashboard
+        </Link>
 
-<div className="max-w-6xl mx-auto flex justify-between items-center p-4">
+        <Link
+          href="/learning"
+          className="hover:text-blue-600"
+        >
+          Learning
+        </Link>
 
-{/* LOGO */}
+        <Link
+          href="/official"
+          className="hover:text-blue-600"
+        >
+          Official Exam
+        </Link>
 
-<Link href="/" className="text-xl font-bold text-blue-700">
-DriveMaster MU 🚗
-</Link>
+        <Link
+          href="/master"
+          className="hover:text-blue-600"
+        >
+          Master Mode
+        </Link>
 
-{/* NAV LINKS */}
+        {/* Language selector */}
 
-<div className="flex items-center gap-6">
+        <select
+          value={language}
+          onChange={(e)=>setLanguage(e.target.value)}
+          className="border rounded px-2 py-1"
+        >
+          <option value="EN">EN</option>
+          <option value="FR">FR</option>
+        </select>
 
-<Link href="/dashboard">
-Dashboard
-</Link>
+        {/* Logout */}
 
-<Link href="/learning">
-Learning
-</Link>
+        {user && (
 
-<Link href="/official">
-Official Exam
-</Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            Logout
+          </button>
 
-<Link href="/master">
-Master Mode
-</Link>
+        )}
 
-{/* LANGUAGE SWITCH */}
+      </div>
 
-<select
-value={lang}
-onChange={(e)=>changeLanguage(e.target.value)}
-className="border rounded px-2 py-1"
->
+    </nav>
 
-<div className="flex items-center gap-2 text-orange-600 font-semibold">
-🔥 {streak}
-</div>
-
-<option value="EN">EN</option>
-<option value="FR">FR</option>
-
-</select>
-
-</div>
-
-</div>
-
-</nav>
-
-)
+  )
 
 }
