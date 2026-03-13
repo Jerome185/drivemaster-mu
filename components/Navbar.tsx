@@ -59,7 +59,7 @@ return (
 
 {/* LOGO */}
 
-<Link href="/app" className="font-bold text-xl text-blue-900">
+<Link href="/" className="text-xl font-bold text-blue-700">
 DriveMaster MU 🚗
 </Link>
 
