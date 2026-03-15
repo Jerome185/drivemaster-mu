@@ -4,114 +4,127 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
+import { useLanguage } from "@/app/context/LanguageContext"
 
 const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function Navbar() {
+export default function Navbar(){
 
-  const router = useRouter()
+const router = useRouter()
 
-  const [user,setUser] = useState<any>(null)
-  const [language,setLanguage] = useState("EN")
+const [user,setUser] = useState<any>(null)
 
-  useEffect(()=>{
+const { language,setLanguage } = useLanguage()
 
-    const getUser = async ()=>{
 
-      const { data } = await supabase.auth.getUser()
+useEffect(()=>{
 
-      setUser(data.user)
+const loadUser = async ()=>{
 
-    }
+const { data } = await supabase.auth.getUser()
 
-    getUser()
+setUser(data.user)
 
-  },[])
+}
 
-  const handleLogout = async ()=>{
+loadUser()
 
-    await supabase.auth.signOut()
+},[])
 
-    router.push("/login")
 
-  }
+const handleLogout = async ()=>{
 
-  return (
+await supabase.auth.signOut()
 
-    <nav className="flex items-center justify-between px-6 py-4 border-b bg-white">
+router.push("/login")
 
-      {/* Logo */}
+}
 
-      <Link
-        href="/"
-        className="text-xl font-bold text-blue-700"
-      >
-        DriveMaster MU 🚗
-      </Link>
 
-      {/* Navigation */}
+return(
 
-      <div className="flex items-center gap-6">
+<nav className="flex items-center justify-between px-6 py-4 border-b bg-white">
 
-        <Link
-          href="/dashboard"
-          className="hover:text-blue-600"
-        >
-          Dashboard
-        </Link>
+{/* LOGO */}
 
-        <Link
-          href="/learning"
-          className="hover:text-blue-600"
-        >
-          Learning
-        </Link>
+<Link
+href="/"
+className="text-xl font-bold text-blue-700"
+>
 
-        <Link
-          href="/official"
-          className="hover:text-blue-600"
-        >
-          Official Exam
-        </Link>
+DriveMaster MU 🚗
 
-        <Link
-          href="/master"
-          className="hover:text-blue-600"
-        >
-          Master Mode
-        </Link>
+</Link>
 
-        {/* Language selector */}
 
-        <select
-          value={language}
-          onChange={(e)=>setLanguage(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="EN">EN</option>
-          <option value="FR">FR</option>
-        </select>
+{/* MENU */}
 
-        {/* Logout */}
+<div className="flex items-center gap-6">
 
-        {user && (
+<Link href="/dashboard">Dashboard</Link>
 
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded"
-          >
-            Logout
-          </button>
+<Link href="/learning">Learning</Link>
 
-        )}
+<Link href="/official">Official Exam</Link>
 
-      </div>
+<Link href="/master">Master Mode</Link>
 
-    </nav>
+<Link
+href="/premium"
+className="text-yellow-600 font-semibold"
+>
+Premium
+</Link>
 
-  )
+
+{/* LANGUAGE */}
+
+<select
+value={language}
+onChange={(e)=>{
+
+const newLang = e.target.value
+
+setLanguage(newLang)
+
+localStorage.setItem("lang",newLang)
+
+window.dispatchEvent(
+new CustomEvent("languageChange",{detail:newLang})
+)
+
+}}
+className="border p-1 rounded"
+>
+
+<option value="EN">EN</option>
+<option value="FR">FR</option>
+
+</select>
+
+
+{/* LOGOUT */}
+
+{user &&(
+
+<button
+onClick={handleLogout}
+className="bg-red-500 text-white px-3 py-1 rounded"
+>
+
+Logout
+
+</button>
+
+)}
+
+</div>
+
+</nav>
+
+)
 
 }

@@ -1,50 +1,126 @@
-import { redirect } from "next/navigation"
-import { cookies } from "next/headers"
-import { createServerClient } from "@supabase/ssr"
+"use client"
+
+import { useEffect,useState } from "react"
+import { createBrowserClient } from "@supabase/ssr"
 import Exam from "@/components/Exam"
+import { useLanguage } from "@/app/context/LanguageContext"
+import Link from "next/link"
 
-export default async function OfficialPage() {
-
-const cookieStore = await cookies()
-
-const supabase = createServerClient(
+const supabase = createBrowserClient(
 process.env.NEXT_PUBLIC_SUPABASE_URL!,
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-{
-cookies:{
-get(name:string){
-return cookieStore.get(name)?.value
-},
-set(){},
-remove(){}
-}
-}
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const { data:{ user } } = await supabase.auth.getUser()
+export default function OfficialPage(){
 
-if(!user){
-redirect("/login")
+const { language } = useLanguage()
+
+const [questions,setQuestions] = useState<any[]>([])
+const [loading,setLoading] = useState(true)
+const [isPremium,setIsPremium] = useState(false)
+
+
+useEffect(()=>{
+
+const loadData = async ()=>{
+
+const { data:userData } = await supabase.auth.getUser()
+
+if(!userData.user){
+setLoading(false)
+return
 }
 
-const { data:questions, error } =
-await supabase.rpc("get_official_exam_questions")
+const { data:profile } = await supabase
+.from("users")
+.select("is_premium")
+.eq("id",userData.user.id)
+.single()
 
-if(error || !questions){
-return <div className="p-8">Error loading exam.</div>
+setIsPremium(profile?.is_premium)
+
+
+if(profile?.is_premium){
+
+const { data } = await supabase.rpc(
+"get_official_exam_questions",
+{ lang: language }
+)
+
+setQuestions(data || [])
+
 }
+
+setLoading(false)
+
+}
+
+loadData()
+
+},[language])
+
+
+if(loading){
+
+return(
+<div className="p-10 text-center">
+Loading Official Exam...
+</div>
+)
+
+}
+
+
+if(!isPremium){
 
 return(
 
-<main className="flex min-h-screen flex-col items-center justify-center bg-white p-8">
+<div className="max-w-xl mx-auto p-10 text-center">
 
-<h1 className="text-3xl font-bold text-blue-900 mb-8">
-Official Exam Mode 🟢
+<h1 className="text-3xl font-bold mb-4">
+Official Exam Mode 🔒
 </h1>
 
-<Exam questions={questions} />
+<p className="mb-6">
+Upgrade to Premium to access the Official Exam simulator.
+</p>
 
-</main>
+<Link
+href="/premium"
+className="bg-yellow-600 text-white px-6 py-3 rounded"
+>
+
+Upgrade to Premium
+
+</Link>
+
+</div>
+
+)
+
+}
+
+
+return(
+
+<div className="max-w-4xl mx-auto p-8">
+
+<h1 className="text-3xl font-bold text-center mb-6 text-blue-800">
+
+Official Exam Mode 🟢
+
+</h1>
+
+<div className="flex justify-center">
+
+<Exam
+questions={questions}
+isMaster={false}
+/>
+
+</div>
+
+</div>
 
 )
 

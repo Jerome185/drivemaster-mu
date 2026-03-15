@@ -2,55 +2,39 @@
 
 import { createBrowserClient } from "@supabase/ssr"
 import { useState, useEffect } from "react"
+import { useLanguage } from "@/app/context/LanguageContext"
 
 const supabase = createBrowserClient(
 process.env.NEXT_PUBLIC_SUPABASE_URL!,
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function LearningPage() {
+export default function LearningPage(){
 
-const [lang, setLang] = useState("EN")
-const [categories, setCategories] = useState<any[]>([])
-const [category, setCategory] = useState("")
+const { language } = useLanguage()
 
-const [question, setQuestion] = useState<any>(null)
-const [selected, setSelected] = useState<string | null>(null)
-const [showResult, setShowResult] = useState(false)
-const [loading, setLoading] = useState(false)
+const [categories,setCategories] = useState<any[]>([])
+const [category,setCategory] = useState("")
 
-
-// LOAD LANGUAGE FROM NAVBAR
-
-useEffect(()=>{
-
-const savedLang = localStorage.getItem("lang")
-
-if(savedLang){
-setLang(savedLang)
-}
-
-const handleLangChange = (e:any)=>{
-setLang(e.detail)
-}
-
-window.addEventListener("languageChange", handleLangChange)
-
-return ()=>{
-window.removeEventListener("languageChange", handleLangChange)
-}
-
-},[])
+const [question,setQuestion] = useState<any>(null)
+const [selected,setSelected] = useState<string | null>(null)
+const [showResult,setShowResult] = useState(false)
+const [loading,setLoading] = useState(false)
 
 
 // LOAD CATEGORIES
 
-const loadCategories = async () => {
+const loadCategories = async()=>{
 
-const { data } = await supabase.rpc(
+const { data,error } = await supabase.rpc(
 "get_categories_by_language",
-{ lang }
+{ lang: language }
 )
+
+if(error){
+console.log("Category error",error)
+return
+}
 
 if(data){
 
@@ -67,21 +51,27 @@ setCategory(data[0].name)
 
 // LOAD QUESTION
 
-const loadQuestion = async () => {
+const loadQuestion = async()=>{
 
 if(!category) return
 
 setLoading(true)
 
-const { data } = await supabase.rpc(
+const { data,error } = await supabase.rpc(
 "get_learning_question",
 {
 category_name_input: category,
-lang
+lang: language
 }
 )
 
-if (data && data.length > 0) {
+if(error){
+console.log("Question error",error)
+setLoading(false)
+return
+}
+
+if(data && data.length > 0){
 
 setQuestion(data[0])
 setSelected(null)
@@ -94,51 +84,47 @@ setLoading(false)
 }
 
 
-// LOAD CATEGORIES WHEN LANGUAGE CHANGES
+// LANGUAGE CHANGE
 
 useEffect(()=>{
+
 loadCategories()
-},[lang])
+
+},[language])
 
 
-// LOAD QUESTION WHEN CATEGORY CHANGES
+// CATEGORY CHANGE
 
 useEffect(()=>{
+
 loadQuestion()
+
 },[category])
 
 
-// HANDLE ANSWER
+// SELECT ANSWER
 
-const handleSelect = async (option: string) => {
+const handleSelect = (letter:string)=>{
 
-if (showResult) return
+if(showResult) return
 
-setSelected(option)
+setSelected(letter)
 setShowResult(true)
 
 }
-const { data:userData } = await supabase.auth.getUser()
 
-if(userData?.user){
-
-await supabase.rpc(
-"update_practice_streak",
-{ user_id_input: userData.user.id }
-)
-
-}
 
 // BUTTON STYLE
 
-const getButtonStyle = (letter:string) => {
+const getButtonStyle = (letter:string)=>{
 
-if (!showResult) return "border hover:bg-gray-100"
+if(!showResult)
+return "border hover:bg-gray-100"
 
-if (letter === question.correct_option)
+if(letter === question.correct_option)
 return "bg-green-500 text-white"
 
-if (letter === selected)
+if(letter === selected)
 return "bg-red-500 text-white"
 
 return "border opacity-50"
@@ -148,18 +134,18 @@ return "border opacity-50"
 
 // UI
 
-return (
+return(
 
-<div className="max-w-xl mx-auto p-8">
+<div className="max-w-2xl mx-auto p-8">
 
-<h1 className="text-3xl font-bold mb-6">
+<h1 className="text-3xl font-bold text-center mb-6">
 Learning Mode 🧠
 </h1>
 
 
 {/* CATEGORY SELECTOR */}
 
-<div className="flex gap-3 mb-6">
+<div className="flex gap-3 mb-6 justify-center">
 
 <select
 className="border p-2 rounded"
@@ -168,9 +154,14 @@ onChange={(e)=>setCategory(e.target.value)}
 >
 
 {categories.map((c)=>(
-<option key={c.id} value={c.name}>
+
+<option
+key={c.id}
+value={c.name}
+>
 {c.name}
 </option>
+
 ))}
 
 </select>
@@ -179,9 +170,7 @@ onChange={(e)=>setCategory(e.target.value)}
 onClick={loadQuestion}
 className="bg-blue-600 text-white px-4 py-2 rounded"
 >
-
 New Question
-
 </button>
 
 </div>
@@ -191,7 +180,7 @@ New Question
 
 {loading && (
 
-<p className="text-gray-500">
+<p className="text-gray-500 text-center">
 Loading question...
 </p>
 
@@ -208,6 +197,9 @@ Loading question...
 {question.question_text}
 </h2>
 
+
+{/* IMAGE */}
+
 {question.image_url && (
 
 <img
@@ -216,6 +208,9 @@ className="w-40 mb-4 rounded"
 />
 
 )}
+
+
+{/* ANSWERS */}
 
 <div className="space-y-2">
 
@@ -241,6 +236,9 @@ className={`w-full p-3 text-left rounded ${getButtonStyle(letter)}`}
 })}
 
 </div>
+
+
+{/* RESULT */}
 
 {showResult && (
 
