@@ -7,62 +7,51 @@ import { useEffect, useState } from "react"
 import { useLanguage } from "@/app/context/LanguageContext"
 
 const supabase = createBrowserClient(
-process.env.NEXT_PUBLIC_SUPABASE_URL!,
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function Navbar(){
+export default function Navbar() {
 
-const router = useRouter()
+  const router = useRouter()
+  const [user,setUser] = useState<any>(null)
+  const [menuOpen,setMenuOpen] = useState(false)
 
-const [user,setUser] = useState<any>(null)
+  const { language, setLanguage } = useLanguage()
 
-const { language,setLanguage } = useLanguage()
+  useEffect(()=>{
 
+    const loadUser = async ()=>{
 
-useEffect(()=>{
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user)
 
-const loadUser = async ()=>{
+    }
 
-const { data } = await supabase.auth.getUser()
+    loadUser()
 
-setUser(data.user)
+  },[])
 
-}
+  const logout = async ()=>{
 
-loadUser()
+    await supabase.auth.signOut()
+    router.push("/login")
 
-},[])
+  }
 
+  return (
 
-const handleLogout = async ()=>{
+<nav className="border-b bg-white">
 
-await supabase.auth.signOut()
+<div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
-router.push("/login")
-
-}
-
-
-return(
-
-<nav className="flex items-center justify-between px-6 py-4 border-b bg-white">
-
-{/* LOGO */}
-
-<Link
-href="/"
-className="text-xl font-bold text-blue-700"
->
-
+<Link href="/" className="text-xl font-bold text-blue-700">
 DriveMaster MU 🚗
-
 </Link>
 
+{/* DESKTOP MENU */}
 
-{/* MENU */}
-
-<div className="flex items-center gap-6">
+<div className="hidden md:flex items-center gap-6">
 
 <Link href="/dashboard">Dashboard</Link>
 
@@ -72,32 +61,18 @@ DriveMaster MU 🚗
 
 <Link href="/master">Master Mode</Link>
 
-<Link
-href="/premium"
-className="text-yellow-600 font-semibold"
->
-Premium
-</Link>
-
-
-{/* LANGUAGE */}
-
 <select
 value={language}
 onChange={(e)=>{
 
-const newLang = e.target.value
+const lang = e.target.value
 
-setLanguage(newLang)
+setLanguage(lang)
 
-localStorage.setItem("lang",newLang)
-
-window.dispatchEvent(
-new CustomEvent("languageChange",{detail:newLang})
-)
+localStorage.setItem("lang",lang)
 
 }}
-className="border p-1 rounded"
+className="border px-2 py-1 rounded"
 >
 
 <option value="EN">EN</option>
@@ -105,26 +80,80 @@ className="border p-1 rounded"
 
 </select>
 
-
-{/* LOGOUT */}
-
-{user &&(
+{user && (
 
 <button
-onClick={handleLogout}
+onClick={logout}
 className="bg-red-500 text-white px-3 py-1 rounded"
 >
-
 Logout
-
 </button>
 
 )}
 
 </div>
 
+{/* MOBILE BUTTON */}
+
+<button
+className="md:hidden text-2xl"
+onClick={()=>setMenuOpen(!menuOpen)}
+>
+
+☰
+
+</button>
+
+</div>
+
+{/* MOBILE MENU */}
+
+{menuOpen && (
+
+<div className="md:hidden flex flex-col gap-4 px-4 pb-4">
+
+<Link href="/dashboard">Dashboard</Link>
+
+<Link href="/learning">Learning</Link>
+
+<Link href="/official">Official Exam</Link>
+
+<Link href="/master">Master Mode</Link>
+
+<select
+value={language}
+onChange={(e)=>{
+
+const lang = e.target.value
+setLanguage(lang)
+localStorage.setItem("lang",lang)
+
+}}
+className="border px-2 py-1 rounded"
+>
+
+<option value="EN">EN</option>
+<option value="FR">FR</option>
+
+</select>
+
+{user && (
+
+<button
+onClick={logout}
+className="bg-red-500 text-white px-3 py-1 rounded w-fit"
+>
+Logout
+</button>
+
+)}
+
+</div>
+
+)}
+
 </nav>
 
-)
+  )
 
 }
