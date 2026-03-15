@@ -127,10 +127,12 @@ export default function LandingPage() {
             DriveMaster Premium
           </h3>
 
-          <p className="text-4xl font-bold text-blue-800 mb-4">
+          <p className="text-4xl font-bold text-blue-800 mb-1">
             Rs 2,000
+            </p>
+          <p className="text-2xl font-bold text-blue-800 mb-5">
             One-time payment
-            No subscription
+          
           </p>
 
           <ul className="mb-6 text-left space-y-2">
