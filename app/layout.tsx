@@ -1,22 +1,23 @@
 import "./globals.css"
 import Navbar from "@/components/Navbar"
-import { LanguageProvider } from "./context/LanguageContext"
+import { LanguageProvider } from "@/app/context/LanguageContext"
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-
   return (
     <html lang="en">
       <body>
 
         <LanguageProvider>
 
+          {/* NAVBAR FIXE */}
           <Navbar />
 
-          <main className="min-h-screen">
+          {/* CONTENU AVEC OFFSET */}
+          <main className="pt-20">
             {children}
           </main>
 

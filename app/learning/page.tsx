@@ -55,6 +55,8 @@ const loadQuestion = async()=>{
 
 if(!category) return
 
+console.log("Loading category:", category)
+
 setLoading(true)
 
 const { data,error } = await supabase.rpc(
@@ -73,7 +75,7 @@ return
 
 if(data && data.length > 0){
 
-setQuestion(data[0])
+setQuestion({...data[0]})   // force refresh
 setSelected(null)
 setShowResult(false)
 
