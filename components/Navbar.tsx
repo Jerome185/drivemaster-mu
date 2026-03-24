@@ -16,24 +16,53 @@ export default function Navbar() {
   const router = useRouter()
 
   const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
   const { language, setLanguage } = useLanguage()
 
-  // 🔥 LOAD SESSION (STABLE)
+  // 🔐 LOAD SESSION + PROFILE
   useEffect(() => {
 
     const loadSession = async () => {
+
       const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user || null)
+
+      const currentUser = session?.user || null
+      setUser(currentUser)
+
+      if (currentUser) {
+        const { data: profileData } = await supabase
+          .from("users")
+          .select("is_admin, is_premium")
+          .eq("id", currentUser.id)
+          .single()
+
+        setProfile(profileData)
+      }
     }
 
     loadSession()
 
-    // 🔥 LISTENER LOGIN / LOGOUT
+    // 🔁 LISTENER LOGIN / LOGOUT
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null)
+      async (_event, session) => {
+
+        const currentUser = session?.user || null
+        setUser(currentUser)
+
+        if (currentUser) {
+          const { data: profileData } = await supabase
+            .from("users")
+            .select("is_admin, is_premium")
+            .eq("id", currentUser.id)
+            .single()
+
+          setProfile(profileData)
+        } else {
+          setProfile(null)
+        }
+
       }
     )
 
@@ -65,7 +94,7 @@ export default function Navbar() {
           DriveMaster MU 🚗
         </Link>
 
-        {/* DESKTOP */}
+        {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center gap-6">
 
           <Link href="/dashboard">Dashboard</Link>
@@ -73,6 +102,14 @@ export default function Navbar() {
           <Link href="/official">Official</Link>
           <Link href="/master">Master</Link>
 
+          {/* ADMIN */}
+          {profile?.is_admin && (
+            <Link href="/admin" className="text-purple-600 font-semibold">
+              Admin
+            </Link>
+          )}
+
+          {/* LANGUAGE */}
           <select
             value={language}
             onChange={(e) => changeLanguage(e.target.value)}
@@ -82,12 +119,20 @@ export default function Navbar() {
             <option value="FR">FR</option>
           </select>
 
+          {/* USER */}
           {user && (
             <div className="flex items-center gap-3">
 
               <span className="text-sm text-gray-600 hidden lg:block">
                 {user.email}
               </span>
+
+              {/* PREMIUM BADGE */}
+              {profile?.is_premium && (
+                <span className="bg-yellow-400 text-xs px-2 py-1 rounded">
+                  Premium
+                </span>
+              )}
 
               <button
                 onClick={logout}
@@ -122,6 +167,14 @@ export default function Navbar() {
             <Link href="/official" onClick={closeMenu}>Official</Link>
             <Link href="/master" onClick={closeMenu}>Master</Link>
 
+            {/* ADMIN */}
+            {profile?.is_admin && (
+              <Link href="/admin" onClick={closeMenu} className="text-purple-600 font-semibold">
+                Admin
+              </Link>
+            )}
+
+            {/* LANGUAGE */}
             <select
               value={language}
               onChange={(e) => changeLanguage(e.target.value)}
@@ -131,11 +184,18 @@ export default function Navbar() {
               <option value="FR">FR</option>
             </select>
 
+            {/* USER */}
             {user && (
               <>
                 <p className="text-sm text-gray-600">
                   {user.email}
                 </p>
+
+                {profile?.is_premium && (
+                  <span className="bg-yellow-400 text-xs px-2 py-1 rounded w-fit">
+                    Premium
+                  </span>
+                )}
 
                 <button
                   onClick={() => {
