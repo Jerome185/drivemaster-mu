@@ -14,27 +14,46 @@ const supabase = createBrowserClient(
 export default function Navbar() {
 
   const router = useRouter()
-  const [user,setUser] = useState<any>(null)
-  const [menuOpen,setMenuOpen] = useState(false)
+
+  const [user, setUser] = useState<any>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const { language, setLanguage } = useLanguage()
 
-  useEffect(()=>{
-    const loadUser = async ()=>{
-      const { data } = await supabase.auth.getUser()
-      setUser(data.user)
-    }
-    loadUser()
-  },[])
+  // 🔥 LOAD SESSION (STABLE)
+  useEffect(() => {
 
-  const logout = async ()=>{
+    const loadSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user || null)
+    }
+
+    loadSession()
+
+    // 🔥 LISTENER LOGIN / LOGOUT
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null)
+      }
+    )
+
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+
+  }, [])
+
+  const logout = async () => {
     await supabase.auth.signOut()
     router.push("/login")
   }
 
-  const handleLinkClick = () => {
-    setMenuOpen(false) // 🔥 ferme le menu après clic
+  const changeLanguage = (lang: string) => {
+    setLanguage(lang)
+    localStorage.setItem("lang", lang)
   }
+
+  const closeMenu = () => setMenuOpen(false)
 
   return (
 
@@ -51,16 +70,12 @@ export default function Navbar() {
 
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/learning">Learning</Link>
-          <Link href="/official">Official Exam</Link>
-          <Link href="/master">Master Mode</Link>
+          <Link href="/official">Official</Link>
+          <Link href="/master">Master</Link>
 
           <select
             value={language}
-            onChange={(e)=>{
-              const lang = e.target.value
-              setLanguage(lang)
-              localStorage.setItem("lang",lang)
-            }}
+            onChange={(e) => changeLanguage(e.target.value)}
             className="border px-2 py-1 rounded"
           >
             <option value="EN">EN</option>
@@ -68,12 +83,20 @@ export default function Navbar() {
           </select>
 
           {user && (
-            <button
-              onClick={logout}
-              className="bg-red-500 text-white px-3 py-1 rounded"
-            >
-              Logout
-            </button>
+            <div className="flex items-center gap-3">
+
+              <span className="text-sm text-gray-600 hidden lg:block">
+                {user.email}
+              </span>
+
+              <button
+                onClick={logout}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Logout
+              </button>
+
+            </div>
           )}
 
         </div>
@@ -81,31 +104,27 @@ export default function Navbar() {
         {/* MOBILE BUTTON */}
         <button
           className="md:hidden text-2xl"
-          onClick={()=>setMenuOpen(!menuOpen)}
+          onClick={() => setMenuOpen(!menuOpen)}
         >
           ☰
         </button>
 
       </div>
 
-      {/* MOBILE MENU FULL SCREEN */}
+      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg z-40">
 
           <div className="flex flex-col gap-4 p-4">
 
-            <Link href="/dashboard" onClick={handleLinkClick}>Dashboard</Link>
-            <Link href="/learning" onClick={handleLinkClick}>Learning</Link>
-            <Link href="/official" onClick={handleLinkClick}>Official Exam</Link>
-            <Link href="/master" onClick={handleLinkClick}>Master Mode</Link>
+            <Link href="/dashboard" onClick={closeMenu}>Dashboard</Link>
+            <Link href="/learning" onClick={closeMenu}>Learning</Link>
+            <Link href="/official" onClick={closeMenu}>Official</Link>
+            <Link href="/master" onClick={closeMenu}>Master</Link>
 
             <select
               value={language}
-              onChange={(e)=>{
-                const lang = e.target.value
-                setLanguage(lang)
-                localStorage.setItem("lang",lang)
-              }}
+              onChange={(e) => changeLanguage(e.target.value)}
               className="border px-2 py-1 rounded"
             >
               <option value="EN">EN</option>
@@ -113,15 +132,21 @@ export default function Navbar() {
             </select>
 
             {user && (
-              <button
-                onClick={()=>{
-                  logout()
-                  setMenuOpen(false)
-                }}
-                className="bg-red-500 text-white px-3 py-2 rounded"
-              >
-                Logout
-              </button>
+              <>
+                <p className="text-sm text-gray-600">
+                  {user.email}
+                </p>
+
+                <button
+                  onClick={() => {
+                    logout()
+                    closeMenu()
+                  }}
+                  className="bg-red-500 text-white px-3 py-2 rounded"
+                >
+                  Logout
+                </button>
+              </>
             )}
 
           </div>
