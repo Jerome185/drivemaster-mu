@@ -1,288 +1,133 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useState, useEffect } from "react"
 import { useLanguage } from "@/app/context/LanguageContext"
+import { useRouter } from "next/navigation"
 
 const supabase = createBrowserClient(
-process.env.NEXT_PUBLIC_SUPABASE_URL!,
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function LearningPage(){
+export default function LearningPage() {
 
-const { language } = useLanguage()
+  const { language } = useLanguage()
+  const router = useRouter()
 
-const [categories,setCategories] = useState<any[]>([])
-const [category,setCategory] = useState("")
+  const [categories, setCategories] = useState<any[]>([])
+  const [selectedCategory, setSelectedCategory] = useState("")
+  const [loading, setLoading] = useState(true)
 
-const [question,setQuestion] = useState<any>(null)
-const [selected,setSelected] = useState<string | null>(null)
-const [showResult,setShowResult] = useState(false)
-const [loading,setLoading] = useState(false)
+  useEffect(() => {
 
+    const loadCategories = async () => {
 
-// LOAD CATEGORIES
+      const { data } = await supabase
+        .from("questions")
+        .select("category_id, categories(name)")
+        .not("category_id", "is", null)
 
-const loadCategories = async()=>{
+      if (!data) {
+        setLoading(false)
+        return
+      }
 
-const { data,error } = await supabase.rpc(
-"get_categories_by_language",
-{ lang: language }
-)
+      const unique = Object.values(
+        data.reduce((acc: any, item: any) => {
+          if (item.categories?.name) {
+            acc[item.categories.name] = item.categories
+          }
+          return acc
+        }, {})
+      )
 
-if(error){
-console.log("Category error",error)
-return
-}
+      if (unique.length === 0) {
+        setCategories([{ name: "General" }])
+      } else {
+        setCategories(unique)
+      }
 
-if(data){
+      setLoading(false)
+    }
 
-setCategories(data)
+    loadCategories()
 
-if(data.length > 0){
-setCategory(data[0].name)
-}
+  }, [])
 
-}
+  const startLearning = () => {
+    if (!selectedCategory) return
 
-}
+    router.push(`/learning/session?category=${selectedCategory}`)
+  }
 
+  if (loading) {
+    return <div className="p-10 text-center">Loading...</div>
+  }
 
-// LOAD QUESTION
+  return (
 
-const loadQuestion = async()=>{
+    <div className="max-w-3xl mx-auto p-6">
 
-if(!category) return
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Learning Mode 🧠
+      </h1>
 
-console.log("Loading category:", category)
+      <p className="text-center text-gray-600 mb-8">
+        Practice by category and improve your weak areas faster.
+      </p>
 
-setLoading(true)
+      {/* CATEGORY GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 
-const { data,error } = await supabase.rpc(
-"get_learning_question",
-{
-category_name_input: category,
-lang: language
-}
-)
+        {categories.map((cat: any, index) => {
 
-if(error){
-console.log("Question error",error)
-setLoading(false)
-return
-}
+          const isSelected = selectedCategory === cat.name
 
-if(data && data.length > 0){
+          return (
 
-setQuestion({...data[0]})   // force refresh
-setSelected(null)
-setShowResult(false)
+            <div
+              key={index}
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`p-4 border rounded cursor-pointer transition ${
+                isSelected
+                  ? "bg-blue-600 text-white"
+                  : "bg-white hover:bg-gray-100"
+              }`}
+            >
+              <p className="font-semibold">
+                {cat.name}
+              </p>
+            </div>
 
-}
+          )
+        })}
 
-setLoading(false)
+      </div>
 
-}
+      {/* ACTION */}
+      <div className="text-center">
 
-
-// LANGUAGE CHANGE
-
-useEffect(()=>{
-
-loadCategories()
-
-},[language])
-
-
-// CATEGORY CHANGE
-
-useEffect(()=>{
-
-loadQuestion()
-
-},[category])
-
-
-// SELECT ANSWER
-
-const handleSelect = (letter:string)=>{
-
-if(showResult) return
-
-setSelected(letter)
-setShowResult(true)
-
-}
-
-
-// BUTTON STYLE
-
-const getButtonStyle = (letter:string)=>{
-
-if(!showResult)
-return "border hover:bg-gray-100"
-
-if(letter === question.correct_option)
-return "bg-green-500 text-white"
-
-if(letter === selected)
-return "bg-red-500 text-white"
-
-return "border opacity-50"
-
-}
-
-
-// UI
-
-return(
-
-<div className="max-w-2xl mx-auto p-8">
-
-<h1 className="text-3xl font-bold text-center mb-6">
-Learning Mode 🧠
-</h1>
-
-
-{/* CATEGORY SELECTOR */}
-
-<div className="flex gap-3 mb-6 justify-center">
-
-<select
-className="border p-2 rounded"
-value={category}
-onChange={(e)=>setCategory(e.target.value)}
->
-
-{categories.map((c)=>(
-
-<option
-key={c.id}
-value={c.name}
->
-{c.name}
-</option>
-
-))}
-
-</select>
-
-<button
-onClick={loadQuestion}
-className="bg-blue-600 text-white px-4 py-2 rounded"
->
-New Question
-</button>
-
-</div>
-
-
-{/* LOADING */}
-
-{loading && (
-
-<p className="text-gray-500 text-center">
-Loading question...
-</p>
-
-)}
-
-
-{/* QUESTION */}
-
-{question && !loading && (
-
-<div className="border p-6 rounded-xl shadow">
-
-<h2 className="text-lg font-semibold mb-4">
-{question.question_text}
-</h2>
-
-
-{/* IMAGE */}
-
-{question.image_url && (
-
-<img
-src={question.image_url}
-className="w-40 mb-4 rounded"
-/>
-
-)}
-
-
-{/* ANSWERS */}
-
-<div className="space-y-2">
-
-{["A","B","C","D"].map((letter)=>{
-
-const text =
-question[`option_${letter.toLowerCase()}`]
-
-return(
-
-<button
-key={letter}
-onClick={()=>handleSelect(letter)}
-className={`w-full p-3 text-left rounded ${getButtonStyle(letter)}`}
->
-
-{letter}. {text}
-
-</button>
-
-)
-
-})}
-
-</div>
-
-
-{/* RESULT */}
-
-{showResult && (
-
-<div className="mt-4">
-
-{selected === question.correct_option ? (
-
-<p className="text-green-600 font-semibold">
-✅ Correct
-</p>
-
-):(
-
-<p className="text-red-600 font-semibold">
-❌ Incorrect — Correct answer: {question.correct_option}
-</p>
-
-)}
-
-<p className="text-gray-600 mt-2">
-{question.explanation}
-</p>
-
-<button
-onClick={loadQuestion}
-className="mt-4 bg-gray-800 text-white px-4 py-2 rounded"
->
-
-Next Question
-
-</button>
-
-</div>
-
-)}
-
-</div>
-
-)}
-
-</div>
-
-)
-
+        <button
+          onClick={startLearning}
+          disabled={!selectedCategory}
+          className={`px-6 py-3 rounded text-white ${
+            selectedCategory
+              ? "bg-blue-700 hover:bg-blue-800"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Start Learning 🚀
+        </button>
+
+      </div>
+
+      {/* BONUS INFO */}
+      <div className="mt-10 text-center text-sm text-gray-500">
+        💡 Tip: Focus on your weakest category first
+      </div>
+
+    </div>
+
+  )
 }
