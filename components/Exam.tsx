@@ -10,7 +10,6 @@ const supabase = createBrowserClient(
 
 type Question = {
   id: string
-  category_name?: string
   question_text: string
   option_a: string
   option_b: string
@@ -33,18 +32,16 @@ export default function Exam({
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
-  const [selected, setSelected] = useState<string[]>([])
+  const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [examFinished, setExamFinished] = useState(false)
-  const [reviewMode, setReviewMode] = useState(false)
+
+  const [isPremium, setIsPremium] = useState(false)
 
   const timePerQuestion = isMaster ? 30 : 60
   const [timeLeft, setTimeLeft] = useState(timePerQuestion)
 
   const currentQuestion = questions[currentIndex]
-
-  const correctAnswers = currentQuestion.correct_option.split(',')
-  const isMultiple = correctAnswers.length > 1
 
   const totalPossibleScore = questions.reduce(
     (sum, q) => sum + q.weight,
@@ -55,26 +52,38 @@ export default function Exam({
   const passThreshold = isMaster ? 85 : 70
   const passed = percentage >= passThreshold
 
-  /* ANTI REFRESH */
+  // 🔥 LOAD PROFILE
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault()
-      e.returnValue = "Exam in progress"
+
+    const loadProfile = async () => {
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const { data } = await supabase
+        .from("users")
+        .select("is_premium, premium_expires_at")
+        .eq("id", session.user.id)
+        .single()
+
+      const isPremiumValid =
+        data?.is_premium &&
+        (!data?.premium_expires_at ||
+          new Date(data.premium_expires_at) > new Date())
+
+      setIsPremium(isPremiumValid)
     }
 
-    window.addEventListener("beforeunload", handleBeforeUnload)
+    loadProfile()
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
   }, [])
 
-  /* TIMER RESET */
+  // TIMER RESET
   useEffect(() => {
     setTimeLeft(timePerQuestion)
   }, [currentIndex])
 
-  /* TIMER */
+  // TIMER
   useEffect(() => {
 
     if (examFinished) return
@@ -85,64 +94,71 @@ export default function Exam({
     }
 
     const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1)
+      setTimeLeft(prev => prev - 1)
     }, 1000)
 
     return () => clearInterval(interval)
 
   }, [timeLeft, examFinished])
 
- /* ANSWER SELECT */
-const handleSelect = (option: string) => {
+  // ANSWER SELECT
+  const handleSelect = (option: string) => {
 
-  if (examFinished) return
+    if (selected || examFinished) return
 
-  if (isMultiple) {
-    setSelected(prev =>
-      prev.includes(option)
-        ? prev.filter(a => a !== option)
-        : [...prev, option]
-    )
-  } else {
-
-    if (selected.length > 0) return
-
-    setSelected([option])
+    setSelected(option)
     setShowResult(true)
 
-    const isCorrect = correctAnswers.includes(option)
-
-    // ✅ SCORE NORMAL
-    if (isCorrect) {
+    if (option === currentQuestion.correct_option) {
       setScore(prev => prev + currentQuestion.weight)
     }
+  }
 
-    // 💀 MASTER MODE → FAIL IMMÉDIAT
-    if (isMaster && !isCorrect) {
-      setExamFinished(true)
+  // 🔥 NEXT QUESTION WITH FREE LIMIT
+  const handleNext = async () => {
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+
+    const userId = session.user.id
+
+    const { data: user } = await supabase
+      .from("users")
+      .select("daily_questions_count, last_question_date, is_premium, premium_expires_at")
+      .eq("id", userId)
+      .single()
+
+    const today = new Date().toISOString().split("T")[0]
+
+    let count = user?.daily_questions_count || 0
+
+    // RESET IF NEW DAY
+    if (user?.last_question_date !== today) {
+      count = 0
+    }
+
+    const isPremiumValid =
+      user?.is_premium &&
+      (!user?.premium_expires_at ||
+        new Date(user.premium_expires_at) > new Date())
+
+    // 🔒 LIMIT FREE USERS
+    if (!isPremiumValid && count >= 10) {
+      alert("🚀 Free limit reached (10 questions/day). Upgrade to continue.")
+      window.location.href = "/premium"
       return
     }
-  }
-}
 
-  /* VALIDATE MULTI */
-  const handleValidate = () => {
+    // ➕ UPDATE COUNT
+    await supabase
+      .from("users")
+      .update({
+        daily_questions_count: count + 1,
+        last_question_date: today
+      })
+      .eq("id", userId)
 
-    setShowResult(true)
-
-    const isCorrect =
-      correctAnswers.length === selected.length &&
-      correctAnswers.every(a => selected.includes(a))
-
-    if (isCorrect) {
-      setScore(prev => prev + currentQuestion.weight)
-    }
-  }
-
-  /* NEXT */
-  const handleNext = () => {
-
-    setSelected([])
+    setSelected(null)
     setShowResult(false)
 
     if (currentIndex + 1 < questions.length) {
@@ -152,8 +168,8 @@ const handleSelect = (option: string) => {
     }
   }
 
-  /* RESULT SCREEN */
-  if (examFinished && !reviewMode) {
+  // RESULT SCREEN
+  if (examFinished) {
     return (
       <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
 
@@ -171,95 +187,33 @@ const handleSelect = (option: string) => {
           Percentage: {percentage}%
         </p>
 
-        <div className="flex flex-col gap-3">
-
-          <button
-            onClick={() => setReviewMode(true)}
-            className="bg-green-700 text-white px-4 py-2 rounded"
-          >
-            Review Answers
-          </button>
-
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-blue-900 text-white px-4 py-2 rounded"
-          >
-            Retry Exam
-          </button>
-
-        </div>
-
-      </div>
-    )
-  }
-
-  /* REVIEW SCREEN */
-  if (reviewMode) {
-    return (
-      <div className="max-w-2xl w-full border p-8 rounded shadow bg-white">
-
-        <h2 className="text-2xl font-bold mb-6">
-          Exam Review
-        </h2>
-
-        <div className="space-y-6">
-
-          {questions.map((q, index) => (
-            <div key={q.id} className="border p-4 rounded">
-
-              <p className="font-semibold mb-2">
-                Question {index + 1}
-              </p>
-
-              <p>{q.question_text}</p>
-
-              {q.image_url && (
-                <img src={q.image_url} className="w-32 my-2"/>
-              )}
-
-              <p className="text-blue-700">
-                Correct answer: {q.correct_option}
-              </p>
-
-              <p className="text-gray-600 mt-2">
-                {q.explanation}
-              </p>
-
-            </div>
-          ))}
-
-        </div>
-
         <button
           onClick={() => window.location.reload()}
-          className="mt-6 bg-blue-900 text-white px-4 py-2 rounded"
+          className="bg-blue-900 text-white px-4 py-2 rounded"
         >
-          Back to Home
+          Retry
         </button>
 
       </div>
     )
   }
 
-  /* EXAM SCREEN */
+  // MAIN UI
   return (
 
     <div className="max-w-xl w-full border p-6 rounded shadow bg-white">
 
+      {!isPremium && (
+        <p className="text-sm text-orange-500 mb-2 text-center">
+          Free limit: 10 questions/day
+        </p>
+      )}
+
       <p className="text-sm text-gray-500 mb-2">
-        Question {currentIndex + 1} of {questions.length}
+        Question {currentIndex + 1} / {questions.length}
       </p>
 
-      <div className="w-full bg-gray-300 h-3 rounded mb-4 overflow-hidden">
-        <div
-          className="bg-blue-600 h-full"
-          style={{
-            width: `${((currentIndex + 1) / questions.length) * 100}%`
-          }}
-        />
-      </div>
-
-      <p className="text-sm font-semibold text-red-600 mb-4">
+      <p className="text-sm text-red-600 mb-4">
         Time left: {timeLeft}s
       </p>
 
@@ -268,71 +222,39 @@ const handleSelect = (option: string) => {
       </h2>
 
       {currentQuestion.image_url && (
-        <img
-          src={currentQuestion.image_url}
-          alt="road-sign"
-          className="my-4 w-40 mx-auto"
-        />
-      )}
-
-      {isMultiple && (
-        <p className="text-sm text-gray-500 mb-2">
-          Select all correct answers
-        </p>
+        <img src={currentQuestion.image_url} className="my-4 w-40 mx-auto"/>
       )}
 
       <div className="space-y-2">
 
-        {["A","B","C","D"].map((letter) => {
+        {["A","B","C","D"].map(letter => {
 
           const optionText =
             currentQuestion[`option_${letter.toLowerCase()}` as keyof Question] as string
 
           return (
-
             <button
               key={letter}
               onClick={() => handleSelect(letter)}
-              className={`w-full text-left border p-2 rounded
-              ${selected.includes(letter) ? "bg-blue-200" : "hover:bg-gray-100"}`}
+              className="w-full text-left border p-2 rounded hover:bg-gray-100"
             >
               {letter}. {optionText}
             </button>
-
           )
-
         })}
 
       </div>
-
-      {isMultiple && selected.length > 0 && !showResult && (
-        <button
-          onClick={handleValidate}
-          className="mt-4 bg-green-700 text-white px-4 py-2 rounded"
-        >
-          Validate Answer
-        </button>
-      )}
 
       {showResult && (
 
         <div className="mt-4">
 
-          {(
-            correctAnswers.length === selected.length &&
-            correctAnswers.every(a => selected.includes(a))
-          ) ? (
-
-            <p className="text-green-600 font-semibold">
-              Correct ✅
-            </p>
-
+          {selected === currentQuestion.correct_option ? (
+            <p className="text-green-600">Correct ✅</p>
           ) : (
-
-            <p className="text-red-600 font-semibold">
-              Incorrect ❌ — Correct answer: {correctAnswers.join(',')}
+            <p className="text-red-600">
+              Incorrect ❌ — Correct answer: {currentQuestion.correct_option}
             </p>
-
           )}
 
           <p className="mt-2 text-sm text-gray-600">
@@ -343,7 +265,7 @@ const handleSelect = (option: string) => {
             onClick={handleNext}
             className="mt-4 bg-blue-900 text-white px-4 py-2 rounded"
           >
-            Next Question
+            Next
           </button>
 
         </div>
@@ -351,6 +273,5 @@ const handleSelect = (option: string) => {
       )}
 
     </div>
-
   )
 }

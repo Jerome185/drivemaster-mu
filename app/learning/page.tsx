@@ -23,16 +23,27 @@ export default function LearningPage() {
 
     const loadCategories = async () => {
 
-      const { data } = await supabase
+      // 🔥 ONLY STANDARD QUESTIONS
+      const { data, error } = await supabase
         .from("questions")
         .select("category_id, categories(name)")
+        .eq("difficulty_level", "standard")
         .not("category_id", "is", null)
 
-      if (!data) {
+      if (error) {
+        console.error(error)
         setLoading(false)
         return
       }
 
+      // 🔥 NO DATA FALLBACK
+      if (!data || data.length === 0) {
+        setCategories([{ name: "General" }])
+        setLoading(false)
+        return
+      }
+
+      // 🔥 UNIQUE CATEGORIES
       const unique = Object.values(
         data.reduce((acc: any, item: any) => {
           if (item.categories?.name) {
@@ -42,12 +53,7 @@ export default function LearningPage() {
         }, {})
       )
 
-      if (unique.length === 0) {
-        setCategories([{ name: "General" }])
-      } else {
-        setCategories(unique)
-      }
-
+      setCategories(unique)
       setLoading(false)
     }
 
@@ -57,7 +63,6 @@ export default function LearningPage() {
 
   const startLearning = () => {
     if (!selectedCategory) return
-
     router.push(`/learning/session?category=${selectedCategory}`)
   }
 
@@ -73,8 +78,13 @@ export default function LearningPage() {
         Learning Mode 🧠
       </h1>
 
-      <p className="text-center text-gray-600 mb-8">
-        Practice by category and improve your weak areas faster.
+      <p className="text-center text-gray-600 mb-6">
+        Practice easier questions first and build your confidence step by step.
+      </p>
+
+      {/* INFO */}
+      <p className="text-center text-sm text-gray-400 mb-8">
+        {categories.length} categories available
       </p>
 
       {/* CATEGORY GRID */}
@@ -124,7 +134,7 @@ export default function LearningPage() {
 
       {/* BONUS INFO */}
       <div className="mt-10 text-center text-sm text-gray-500">
-        💡 Tip: Focus on your weakest category first
+        💡 Tip: Master easy questions first before trying the exam mode
       </div>
 
     </div>
