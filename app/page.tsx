@@ -1,178 +1,156 @@
+"use client"
+
 import Link from "next/link"
 
-export default function LandingPage() {
+export default function HomePage() {
 
   return (
 
-    <main className="min-h-screen bg-white text-gray-900">
+    <div className="max-w-6xl mx-auto px-4 py-12">
 
       {/* HERO */}
 
-      <section className="text-center py-20 px-6">
+      <div className="text-center mb-16">
 
-        <h1 className="text-5xl font-bold mb-6 text-blue-900">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6">
           Pass Your Driving Test in Mauritius 🚗
         </h1>
 
-        <p className="text-xl max-w-2xl mx-auto mb-8">
-          DriveMaster MU helps you practice real driving theory
-          questions with adaptive learning and full exam simulations.
+        <p className="text-lg text-gray-600 mb-6">
+          Practice smarter. Pass faster.
         </p>
 
-        <div className="flex justify-center gap-4">
+        <p className="text-gray-500 mb-8">
+          Prepare with real exam questions, adaptive learning, and full test simulations — all in one app.
+        </p>
+
+        <div className="flex flex-col md:flex-row justify-center gap-4">
 
           <Link
             href="/learning"
-            className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+            className="bg-blue-700 text-white px-6 py-3 rounded"
           >
-            Start Practice
+            Start Practice 🚀
           </Link>
-
-          <Link
-            href="/login"
-            className="border border-gray-400 px-6 py-3 rounded-lg"
-          >
-            Login
-          </Link>
-
-        </div>
-
-      </section>
-
-
-      {/* FEATURES */}
-
-      <section className="py-16 bg-gray-100">
-
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Why DriveMaster MU?
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-
-          <div className="p-6 bg-white rounded shadow">
-            <h3 className="font-bold text-xl mb-2">
-              Real Exam Simulation
-            </h3>
-            <p>
-              Practice full driving theory exams just like the
-              official Mauritius test.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white rounded shadow">
-            <h3 className="font-bold text-xl mb-2">
-              Adaptive Learning
-            </h3>
-            <p>
-              Our system focuses on your weak areas so you improve faster.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white rounded shadow">
-            <h3 className="font-bold text-xl mb-2">
-              Track Your Progress
-            </h3>
-            <p>
-              Monitor your scores and see which categories you must improve.
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* HOW IT WORKS */}
-
-      <section className="py-16">
-
-        <h2 className="text-3xl font-bold text-center mb-12">
-          How It Works
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto text-center">
-
-          <div>
-            <h3 className="font-semibold text-xl mb-2">1️⃣ Practice</h3>
-            <p>Learn road signs and driving rules.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-xl mb-2">2️⃣ Simulate</h3>
-            <p>Take full official exam simulations.</p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-xl mb-2">3️⃣ Pass</h3>
-            <p>Be ready for the real driving test.</p>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* PRICING */}
-
-      <section className="py-16 bg-gray-100 text-center">
-
-        <h2 className="text-3xl font-bold mb-8">
-          Simple Pricing
-        </h2>
-
-        <div className="max-w-md mx-auto bg-white p-8 rounded shadow">
-
-          <h3 className="text-2xl font-bold mb-4">
-            DriveMaster Premium
-          </h3>
-
-          <p className="text-4xl font-bold text-blue-800 mb-1">
-            Rs 2,000
-            </p>
-          <p className="text-2xl font-bold text-blue-800 mb-5">
-            One-time payment
-          
-          </p>
-
-          <ul className="mb-6 text-left space-y-2">
-            <li>✔ Full question bank</li>
-            <li>✔ Unlimited exam simulations</li>
-            <li>✔ Adaptive learning mode</li>
-            <li>✔ Progress tracking</li>
-          </ul>
 
           <Link
             href="/premium"
-            className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+            className="border px-6 py-3 rounded"
           >
-            Unlock Premium
+            Get Premium 🔓
           </Link>
 
         </div>
 
-      </section>
+      </div>
 
+      {/* FEATURES */}
 
-      {/* CTA */}
+      <div className="grid md:grid-cols-3 gap-6 mb-20">
 
-      <section className="py-20 text-center">
+        <div className="border p-6 rounded text-center">
+
+          <h2 className="text-xl font-semibold mb-2">
+            1️⃣ Practice
+          </h2>
+
+          <p className="text-gray-600">
+            Master road signs and driving rules step by step.
+          </p>
+
+        </div>
+
+        <div className="border p-6 rounded text-center">
+
+          <h2 className="text-xl font-semibold mb-2">
+            2️⃣ Simulate
+          </h2>
+
+          <p className="text-gray-600">
+            Take realistic exam simulations just like the official test.
+          </p>
+
+        </div>
+
+        <div className="border p-6 rounded text-center">
+
+          <h2 className="text-xl font-semibold mb-2">
+            3️⃣ Pass
+          </h2>
+
+          <p className="text-gray-600">
+            Build confidence and pass your driving test on the first try.
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* PRICING */}
+
+      <div className="text-center mb-10">
 
         <h2 className="text-3xl font-bold mb-6">
-          Start Practicing Today
+          Simple & Affordable Pricing
         </h2>
 
+      </div>
+
+      <div className="max-w-md mx-auto border rounded p-8 text-center shadow">
+
+        <h3 className="text-xl font-semibold mb-2">
+          DriveMaster Premium
+        </h3>
+
+        <p className="text-4xl font-bold text-blue-700 mb-2">
+          Rs 2,000
+        </p>
+
+        <p className="mb-4 text-gray-600">
+          One-time payment
+        </p>
+
+        <p className="mb-6 text-green-600 font-semibold">
+          ✔ Lifetime access — no recurring fees
+        </p>
+
+        <ul className="text-left mb-6 space-y-2">
+
+          <li>✔ Full question bank (updated regularly)</li>
+          <li>✔ Unlimited exam simulations</li>
+          <li>✔ Smart learning mode (focus on weak areas)</li>
+          <li>✔ Track your progress</li>
+
+        </ul>
+
         <Link
-          href="/learning"
-          className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold"
+          href="/premium"
+          className="bg-blue-700 text-white px-6 py-3 rounded block"
         >
-          Start Free Practice
+          Get Premium Access 🔓
         </Link>
 
-      </section>
+        <p className="mt-4 text-sm text-gray-500">
+          Secure payment via Juice
+        </p>
 
-    </main>
+      </div>
+
+      {/* TRUST + URGENCY */}
+
+      <div className="text-center mt-12 text-gray-600">
+
+        <p className="mb-2">
+          Trusted by learners in Mauritius 🇲🇺
+        </p>
+
+        <p className="text-sm text-red-500">
+          Limited time: One-time payment only
+        </p>
+
+      </div>
+
+    </div>
 
   )
-
 }
