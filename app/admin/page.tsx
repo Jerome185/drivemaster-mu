@@ -1,136 +1,81 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect,useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 
 const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function AdminPage() {
+export default function AdminPage(){
 
-  const router = useRouter()
-  const [payments, setPayments] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+const [payments,setPayments] = useState<any[]>([])
 
-  useEffect(() => {
+useEffect(()=>{
 
-    const init = async () => {
+loadPayments()
 
-      // 🔐 1. CHECK SESSION
-      const { data: { session } } = await supabase.auth.getSession()
+},[])
 
-      if (!session) {
-        router.push("/login")
-        return
-      }
+const loadPayments = async()=>{
 
-      const userId = session.user.id
+const { data } = await supabase
+.from("payments")
+.select("*")
+.eq("status","pending")
 
-      // 👤 2. CHECK ADMIN ROLE
-      const { data: profile } = await supabase
-        .from("users")
-        .select("is_admin")
-        .eq("id", userId)
-        .single()
+setPayments(data || [])
 
-      if (!profile?.is_admin) {
-        router.push("/")
-        return
-      }
+}
 
-      // 💰 3. LOAD PAYMENTS
-      const { data } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
+const approve = async(p:any)=>{
 
-      setPayments(data || [])
-      setLoading(false)
-    }
+// 1. update payment
+await supabase
+.from("payments")
+.update({ status:"approved" })
+.eq("id",p.id)
 
-    init()
+// 2. upgrade user
+await supabase
+.from("users")
+.update({ is_premium:true })
+.eq("id",p.user_id)
 
-  }, [router])
+loadPayments()
 
-  const approvePayment = async (payment: any) => {
+}
 
-    // ✅ UPDATE PAYMENT STATUS
-    await supabase
-      .from("payments")
-      .update({ status: "approved" })
-      .eq("id", payment.id)
+return(
 
-    let updateData: any = {}
+<div className="max-w-3xl mx-auto p-8">
 
-    // 🎯 PLAN LOGIC
-    if (payment.plan === "monthly") {
-      updateData.premium_until =
-        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    }
+<h1 className="text-2xl font-bold mb-6">
+Admin Panel
+</h1>
 
-    if (payment.plan === "quarterly") {
-      updateData.premium_until =
-        new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-    }
+{payments.map(p=>(
 
-    if (payment.plan === "lifetime") {
-      updateData.is_premium = true
-      updateData.premium_until = null
-    }
+<div key={p.id} className="border p-4 mb-4 rounded">
 
-    // 👤 UPDATE USER
-    await supabase
-      .from("users")
-      .update(updateData)
-      .eq("id", payment.user_id)
+<p>User: {p.user_id}</p>
+<p>Plan: {p.plan}</p>
+<p>Amount: Rs {p.amount}</p>
+<p>TX: {p.transaction_id}</p>
 
-    // 🔄 REFRESH
-    setPayments(prev => prev.filter(p => p.id !== payment.id))
-  }
+<button
+onClick={()=>approve(p)}
+className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
+>
+Approve
+</button>
 
-  if (loading) {
-    return <div className="p-10 text-center">Loading...</div>
-  }
+</div>
 
-  return (
-    <div className="p-8 max-w-4xl mx-auto">
+))}
 
-      <h1 className="text-3xl font-bold mb-6">
-        Admin Panel 🔐
-      </h1>
+</div>
 
-      {payments.length === 0 && (
-        <p>No pending payments</p>
-      )}
-
-      <div className="space-y-4">
-
-        {payments.map((p) => (
-
-          <div key={p.id} className="border p-4 rounded">
-
-            <p><b>User:</b> {p.user_id}</p>
-            <p><b>Plan:</b> {p.plan}</p>
-            <p><b>Amount:</b> Rs {p.amount}</p>
-            <p><b>Transaction:</b> {p.transaction_id}</p>
-
-            <button
-              onClick={() => approvePayment(p)}
-              className="mt-3 bg-green-600 text-white px-4 py-2 rounded"
-            >
-              Approve
-            </button>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </div>
-  )
+)
 }

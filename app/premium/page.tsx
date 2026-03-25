@@ -1,131 +1,132 @@
 "use client"
 
-import { createBrowserClient } from "@supabase/ssr"
 import { useState } from "react"
+import { createBrowserClient } from "@supabase/ssr"
 
 const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function PremiumPage() {
+export default function PremiumPage(){
 
-  const [txId, setTxId] = useState("")
-  const [plan, setPlan] = useState("monthly")
-  const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(false)
+const [txId,setTxId] = useState("")
+const [plan,setPlan] = useState("1m")
+const [message,setMessage] = useState("")
 
-  const prices: Record<string, number> = {
-    monthly: 200,
-    quarterly: 500,
-    lifetime: 2000
-  }
+const prices:any = {
+  "1m": 500,
+  "3m": 1200,
+  "lifetime": 2000
+}
 
-  const submitPayment = async () => {
+const submitPayment = async()=>{
 
-    if (!txId || txId.length < 6) {
-      setMessage("Enter a valid transaction ID")
-      return
-    }
+const { data:userData } = await supabase.auth.getUser()
 
-    setLoading(true)
+if(!userData.user){
+setMessage("Please login first")
+return
+}
 
-    const { data: userData } = await supabase.auth.getUser()
+if(!txId){
+setMessage("Enter transaction ID")
+return
+}
 
-    if (!userData?.user) {
-      setMessage("You must be logged in")
-      setLoading(false)
-      return
-    }
+await supabase
+.from("payments")
+.insert({
+user_id: userData.user.id,
+amount: prices[plan],
+plan,
+payment_method: "Juice",
+transaction_id: txId,
+status: "pending"
+})
 
-    const { error } = await supabase
-      .from("payments")
-      .insert({
-        user_id: userData.user.id,
-        amount: prices[plan],
-        payment_method: "Juice",
-        transaction_id: txId,
-        plan: plan,
-        status: "pending"
-      })
+setMessage("✅ Payment submitted. Awaiting approval.")
 
-    if (error) {
-      console.error(error)
-      setMessage("Error submitting payment")
-    } else {
-      setMessage("Payment submitted. Verification within 24h.")
-      setTxId("")
-    }
+}
 
-    setLoading(false)
-  }
+return(
 
-  return (
+<div className="max-w-xl mx-auto p-8">
 
-    <div className="max-w-xl mx-auto p-8">
+<h1 className="text-3xl font-bold text-center mb-6">
+Upgrade to Premium 🚀
+</h1>
 
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        DriveMaster Premium 🚀
-      </h1>
+<p className="text-center mb-8 text-gray-600">
+Unlock Master Mode, harder questions and faster progress.
+</p>
 
-      <div className="border p-6 rounded">
+{/* PLANS */}
 
-        {/* PLAN SELECTION */}
-        <label className="block mb-2 font-semibold">
-          Select Plan:
-        </label>
+<div className="space-y-4 mb-8">
 
-        <select
-          value={plan}
-          onChange={(e) => setPlan(e.target.value)}
-          className="border p-2 w-full mb-4"
-        >
-          <option value="monthly">1 Month — Rs 200</option>
-          <option value="quarterly">3 Months — Rs 500</option>
-          <option value="lifetime">Lifetime — Rs 2000</option>
-        </select>
+{[
+{ id:"1m", label:"1 Month", price:"Rs 500" },
+{ id:"3m", label:"3 Months", price:"Rs 1200" },
+{ id:"lifetime", label:"Lifetime 🔥", price:"Rs 2000" }
+].map(p=>{
 
-        <p className="mb-4 text-lg">
-          Price: <b>Rs {prices[plan]}</b>
-        </p>
+const active = plan === p.id
 
-        {/* PAYMENT INFO */}
-        <div className="bg-gray-100 p-4 rounded mb-4">
-          <p>Pay using Juice:</p>
-          <p className="font-bold text-xl">
-            5771 8436
-          </p>
-        </div>
+return(
 
-        {/* TRANSACTION INPUT */}
-        <p className="mb-2">
-          Enter your Juice Transaction ID:
-        </p>
+<div
+key={p.id}
+onClick={()=>setPlan(p.id)}
+className={`p-4 border rounded cursor-pointer ${
+active ? "bg-blue-600 text-white" : "bg-white"
+}`}
+>
 
-        <input
-          value={txId}
-          onChange={(e) => setTxId(e.target.value)}
-          className="border p-2 w-full mb-4"
-        />
+<p className="font-semibold">{p.label}</p>
+<p>{p.price}</p>
 
-        {/* BUTTON */}
-        <button
-          onClick={submitPayment}
-          disabled={loading}
-          className="bg-blue-700 text-white px-4 py-2 rounded w-full"
-        >
-          {loading ? "Submitting..." : "Submit Payment"}
-        </button>
+</div>
 
-        {/* MESSAGE */}
-        {message && (
-          <p className="mt-4 text-green-600 text-center">
-            {message}
-          </p>
-        )}
+)
 
-      </div>
+})}
 
-    </div>
-  )
+</div>
+
+{/* PAYMENT */}
+
+<div className="bg-gray-100 p-4 rounded mb-6">
+
+<p className="mb-2">Pay via Juice:</p>
+
+<p className="text-xl font-bold">
+5771 8436
+</p>
+
+</div>
+
+<input
+placeholder="Transaction ID"
+value={txId}
+onChange={(e)=>setTxId(e.target.value)}
+className="border p-2 w-full mb-4"
+/>
+
+<button
+onClick={submitPayment}
+className="bg-green-600 text-white w-full py-3 rounded"
+>
+Submit Payment
+</button>
+
+{message && (
+<p className="mt-4 text-center text-green-600">
+{message}
+</p>
+)}
+
+</div>
+
+)
 }
