@@ -1,132 +1,99 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect,useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
 import Exam from "@/components/Exam"
 import { useLanguage } from "@/app/context/LanguageContext"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function MasterPage() {
+export default function MasterPage(){
 
-  const router = useRouter()
   const { language } = useLanguage()
+  const router = useRouter()
 
-  const [questions, setQuestions] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [questions,setQuestions] = useState<any[]>([])
+  const [loading,setLoading] = useState(true)
+  const [profile,setProfile] = useState<any>(null)
 
-  useEffect(() => {
+  useEffect(()=>{
 
-    const init = async () => {
+    const loadData = async ()=>{
 
-      try {
-        // 🔐 1. CHECK SESSION
-        const { data: { session }, error: sessionError } =
-          await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
-        if (sessionError || !session) {
-          console.log("No session → redirect login")
-          router.push("/login")
-          return
-        }
-
-        const userId = session.user.id
-
-        // 👤 2. GET USER PROFILE
-        let { data: profile, error: profileError } = await supabase
-          .from("users")
-          .select("is_premium, premium_until")
-          .eq("id", userId)
-          .single()
-
-        // 🧠 3. AUTO CREATE PROFILE IF NOT EXISTS
-        if (profileError || !profile) {
-          console.log("Creating user profile...")
-
-          await supabase.from("users").insert({
-            id: userId,
-            is_premium: false
-          })
-
-          profile = {
-            is_premium: false,
-            premium_until: null
-          }
-        }
-
-        // 💰 4. CHECK PREMIUM VALIDITY
-        const now = new Date()
-        const isPremiumActive =
-          profile.is_premium &&
-          (!profile.premium_until ||
-            new Date(profile.premium_until) > now)
-
-        if (!isPremiumActive) {
-          console.log("Not premium → redirect premium")
-          router.push("/premium")
-          return
-        }
-
-        // 📚 5. LOAD MASTER QUESTIONS
-        const { data, error } = await supabase.rpc(
-          "get_master_exam_questions",
-          { lang: language }
-        )
-
-        if (error) {
-          console.error("RPC error:", error)
-        }
-
-        setQuestions(data || [])
-
-      } catch (err) {
-        console.error("Unexpected error:", err)
+      if(!session){
+        router.push("/login")
+        return
       }
 
+      const user = session.user
+
+      const { data: profileData } = await supabase
+        .from("users")
+        .select("is_premium, premium_expires_at")
+        .eq("id",user.id)
+        .single()
+
+      setProfile(profileData)
+
+      const isPremiumValid =
+        profileData?.is_premium &&
+        (!profileData?.premium_expires_at ||
+         new Date(profileData.premium_expires_at) > new Date())
+
+      if(!isPremiumValid){
+        setLoading(false)
+        return
+      }
+
+      const { data } = await supabase.rpc(
+        "get_master_exam_questions",
+        { lang: language }
+      )
+
+      setQuestions(data || [])
       setLoading(false)
+
     }
 
-    init()
+    loadData()
 
-  }, [language, router])
+  },[language])
 
-  // ⏳ LOADING
-  if (loading) {
-    return (
-      <div className="p-10 text-center">
-        Loading Master Mode...
+  if(loading){
+    return <div className="p-10 text-center">Loading...</div>
+  }
+
+  if(!profile?.is_premium){
+    return(
+      <div className="max-w-xl mx-auto p-10 text-center">
+        <h1 className="text-3xl font-bold mb-4">Master Mode 🔒</h1>
+        <Link href="/premium" className="bg-yellow-600 text-white px-6 py-3 rounded">
+          Upgrade 🚀
+        </Link>
       </div>
     )
   }
 
-  // ❌ NO QUESTIONS
-  if (questions.length === 0) {
-    return (
-      <div className="p-10 text-center">
-        No questions available for Master Mode.
-      </div>
-    )
-  }
-
-  // ✅ MAIN UI
-  return (
+  return(
     <div className="max-w-4xl mx-auto p-8">
-
       <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
         Master Mode 🔥
       </h1>
 
-      <div className="flex justify-center">
-        <Exam
-          questions={questions}
-          isMaster={true}
-        />
-      </div>
+      {profile?.premium_expires_at && (
+        <p className="text-orange-500 text-center mb-4">
+          Premium pending validation ⏳
+        </p>
+      )}
 
+      <Exam questions={questions} isMaster={true}/>
     </div>
   )
 }
