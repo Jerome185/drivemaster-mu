@@ -52,7 +52,7 @@ export default function Exam({
   const passThreshold = isMaster ? 85 : 70
   const passed = percentage >= passThreshold
 
-  // 🔥 LOAD PROFILE
+  // 🔐 LOAD USER PROFILE
   useEffect(() => {
 
     const loadProfile = async () => {
@@ -78,12 +78,12 @@ export default function Exam({
 
   }, [])
 
-  // TIMER RESET
+  // ⏱ TIMER RESET
   useEffect(() => {
     setTimeLeft(timePerQuestion)
   }, [currentIndex])
 
-  // TIMER
+  // ⏱ TIMER
   useEffect(() => {
 
     if (examFinished) return
@@ -101,7 +101,46 @@ export default function Exam({
 
   }, [timeLeft, examFinished])
 
-  // ANSWER SELECT
+  // 🧠 UPDATE USER STATS
+  const updateStats = async (isCorrect: boolean) => {
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+
+    const userId = session.user.id
+
+    const { data: existing } = await supabase
+      .from("user_question_stats")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("question_id", currentQuestion.id)
+      .maybeSingle()
+
+    if (existing) {
+      await supabase
+        .from("user_question_stats")
+        .update({
+          wrong_count: isCorrect
+            ? existing.wrong_count
+            : existing.wrong_count + 1,
+          correct_count: isCorrect
+            ? existing.correct_count + 1
+            : existing.correct_count
+        })
+        .eq("id", existing.id)
+    } else {
+      await supabase
+        .from("user_question_stats")
+        .insert({
+          user_id: userId,
+          question_id: currentQuestion.id,
+          wrong_count: isCorrect ? 0 : 1,
+          correct_count: isCorrect ? 1 : 0
+        })
+    }
+  }
+
+  // ✅ SELECT ANSWER
   const handleSelect = (option: string) => {
 
     if (selected || examFinished) return
@@ -109,12 +148,16 @@ export default function Exam({
     setSelected(option)
     setShowResult(true)
 
-    if (option === currentQuestion.correct_option) {
+    const isCorrect = option === currentQuestion.correct_option
+
+    updateStats(isCorrect)
+
+    if (isCorrect) {
       setScore(prev => prev + currentQuestion.weight)
     }
   }
 
-  // 🔥 NEXT QUESTION WITH FREE LIMIT
+  // 🔒 NEXT QUESTION (FREE LIMIT)
   const handleNext = async () => {
 
     const { data: { session } } = await supabase.auth.getSession()
@@ -132,7 +175,6 @@ export default function Exam({
 
     let count = user?.daily_questions_count || 0
 
-    // RESET IF NEW DAY
     if (user?.last_question_date !== today) {
       count = 0
     }
@@ -142,14 +184,12 @@ export default function Exam({
       (!user?.premium_expires_at ||
         new Date(user.premium_expires_at) > new Date())
 
-    // 🔒 LIMIT FREE USERS
     if (!isPremiumValid && count >= 10) {
       alert("🚀 Free limit reached (10 questions/day). Upgrade to continue.")
       window.location.href = "/premium"
       return
     }
 
-    // ➕ UPDATE COUNT
     await supabase
       .from("users")
       .update({
@@ -168,7 +208,7 @@ export default function Exam({
     }
   }
 
-  // RESULT SCREEN
+  // 🏁 RESULT SCREEN
   if (examFinished) {
     return (
       <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
@@ -198,7 +238,7 @@ export default function Exam({
     )
   }
 
-  // MAIN UI
+  // 🎮 MAIN UI
   return (
 
     <div className="max-w-xl w-full border p-6 rounded shadow bg-white">
