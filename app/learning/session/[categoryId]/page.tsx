@@ -20,7 +20,7 @@ type Question = {
   id: number
   sign?: {
     image_url?: string
-  } // ✅ OBJET (plus tableau)
+  }
   question_translations: Translation[]
 }
 
@@ -43,14 +43,12 @@ export default function LearningSessionPage() {
     const fetchQuestions = async () => {
       setLoading(true)
 
-      const langCode = language.toUpperCase()
-
       const { data, error } = await supabase
         .from("questions")
         .select(`
           id,
           sign:sign_id (image_url),
-          question_translations!inner (
+          question_translations (
             language_code,
             question_text,
             option_a,
@@ -62,9 +60,8 @@ export default function LearningSessionPage() {
           )
         `)
         .eq("category_id", categoryId)
-        .eq("question_translations.language_code", langCode)
         .eq("is_active", true)
-        .limit(30)
+        .limit(50) // 🔥 tu peux augmenter
 
       if (error) {
         console.error("Supabase error:", error)
@@ -76,7 +73,7 @@ export default function LearningSessionPage() {
     }
 
     fetchQuestions()
-  }, [categoryId, language])
+  }, [categoryId])
 
   if (loading) {
     return (
@@ -95,7 +92,20 @@ export default function LearningSessionPage() {
   }
 
   const currentQuestion = questions[currentIndex]
-  const translation = currentQuestion.question_translations[0]
+
+  // 🔥 FILTRAGE LANGUE CÔTÉ FRONT
+  const translation = currentQuestion.question_translations.find(
+    (t) => t.language_code === language.toUpperCase()
+  )
+
+  // ❌ PAS DE FALLBACK (comme tu veux)
+  if (!translation) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>No questions available in {language.toUpperCase()}</p>
+      </div>
+    )
+  }
 
   const handleAnswer = (answer: string) => {
     setSelectedAnswer(answer)
@@ -121,7 +131,7 @@ export default function LearningSessionPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
 
-      {/* QUESTION COUNT */}
+      {/* COUNT */}
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
@@ -131,7 +141,7 @@ export default function LearningSessionPage() {
         {translation.question_text}
       </h1>
 
-      {/* IMAGE ✅ FIX FINAL */}
+      {/* IMAGE */}
       {currentQuestion.sign?.image_url && (
         <img
           src={currentQuestion.sign.image_url}
