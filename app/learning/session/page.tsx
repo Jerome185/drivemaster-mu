@@ -20,7 +20,7 @@ type Question = {
   id: number
   sign?: {
     image_url?: string
-  }
+  }[] // ✅ FIX IMPORTANT (tableau)
   question_translations: Translation[]
 }
 
@@ -69,7 +69,7 @@ export default function LearningSessionPage() {
       if (error) {
         console.error("Supabase error:", error)
       } else {
-        setQuestions(data || [])
+        setQuestions((data as Question[]) || [])
       }
 
       setLoading(false)
@@ -123,24 +123,26 @@ export default function LearningSessionPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
 
-      {/* DEBUG (tu peux supprimer après test) */}
+      {/* DEBUG (optionnel) */}
       <p className="text-xs text-gray-400 mb-2">
         UI: {language} | DB: {translation.language_code}
       </p>
 
+      {/* QUESTION COUNT */}
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
 
+      {/* QUESTION */}
       <h1 className="text-xl font-semibold mb-4">
         {translation.question_text}
       </h1>
 
-      {/* IMAGE */}
-      {currentQuestion.sign?.image_url && (
+      {/* IMAGE (FIX ARRAY) */}
+      {currentQuestion.sign?.[0]?.image_url && (
         <img
-          src={currentQuestion.sign.image_url}
-          alt="Sign"
+          src={currentQuestion.sign[0].image_url}
+          alt="Traffic sign"
           className="mb-4 rounded-lg max-h-64 object-contain"
         />
       )}
