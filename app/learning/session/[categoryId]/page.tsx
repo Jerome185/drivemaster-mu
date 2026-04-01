@@ -128,6 +128,10 @@ export default function LearningSessionPage() {
         {translation.question_text}
       </h1>
 
+      <p className="text-xs text-red-500">
+        {JSON.stringify(currentQuestion.sign)}
+        </p>
+
       {currentQuestion.sign?.[0]?.image_url && (
         <img
           src={currentQuestion.sign[0].image_url}
