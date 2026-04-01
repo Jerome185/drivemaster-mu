@@ -61,7 +61,7 @@ export default function LearningSessionPage() {
         `)
         .eq("category_id", categoryId)
         .eq("is_active", true)
-        .limit(50) // 🔥 tu peux augmenter
+        .limit(100)
 
       if (error) {
         console.error("Supabase error:", error)
@@ -93,12 +93,13 @@ export default function LearningSessionPage() {
 
   const currentQuestion = questions[currentIndex]
 
-  // 🔥 FILTRAGE LANGUE CÔTÉ FRONT
+  // 🔥 FIX FINAL LANGUE (robuste)
+  const lang = language.toLowerCase()
+
   const translation = currentQuestion.question_translations.find(
-    (t) => t.language_code === language.toUpperCase()
+    (t) => t.language_code?.trim().toLowerCase() === lang
   )
 
-  // ❌ PAS DE FALLBACK (comme tu veux)
   if (!translation) {
     return (
       <div className="flex justify-center items-center h-screen">
