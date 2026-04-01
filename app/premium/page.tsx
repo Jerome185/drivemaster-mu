@@ -80,7 +80,7 @@ export default function PremiumPage(){
         {[
           { id:"1m", label:"1 Month", price:"Rs 500" },
           { id:"3m", label:"3 Months", price:"Rs 1200" },
-          { id:"lifetime", label:"Lifetime 🔥", price:"Rs 2000" }
+          { id:"lifetime", label:"Lifetime 🔥 launch offer first Users", price:"Rs 999" }
         ].map(p=>{
 
           const active = plan === p.id

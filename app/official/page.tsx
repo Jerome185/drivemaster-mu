@@ -3,7 +3,7 @@
 import { useEffect,useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import Exam from "@/components/Exam"
-import { useLanguage } from "@/app/context/LanguageContext"
+import { useLanguage } from "@/app/contexts/LanguageContext"
 import Link from "next/link"
 
 const supabase = createBrowserClient(

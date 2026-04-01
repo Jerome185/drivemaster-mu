@@ -1,6 +1,6 @@
 import "./globals.css"
 import Navbar from "@/components/Navbar"
-import { LanguageProvider } from "@/app/context/LanguageContext"
+import { LanguageProvider } from "@/app/contexts/LanguageContext"
 
 export default function RootLayout({
   children,
