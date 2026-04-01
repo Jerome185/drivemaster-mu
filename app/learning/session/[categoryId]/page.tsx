@@ -20,7 +20,7 @@ type Question = {
   id: number
   sign?: {
     image_url?: string
-  }[]
+  } // ✅ OBJET (plus tableau)
   question_translations: Translation[]
 }
 
@@ -120,26 +120,27 @@ export default function LearningSessionPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+
+      {/* QUESTION COUNT */}
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
 
+      {/* QUESTION */}
       <h1 className="text-xl font-semibold mb-4">
         {translation.question_text}
       </h1>
 
-      <p className="text-xs text-red-500">
-        {JSON.stringify(currentQuestion.sign)}
-        </p>
-
-      {currentQuestion.sign?.[0]?.image_url && (
+      {/* IMAGE ✅ FIX FINAL */}
+      {currentQuestion.sign?.image_url && (
         <img
-          src={currentQuestion.sign[0].image_url}
+          src={currentQuestion.sign.image_url}
           alt="Traffic sign"
           className="mb-4 rounded-lg max-h-64 object-contain"
         />
       )}
 
+      {/* OPTIONS */}
       <div className="grid gap-3">
         {["A", "B", "C", "D"].map((opt) => {
           const isCorrect = opt === translation.correct_option
@@ -164,6 +165,24 @@ export default function LearningSessionPage() {
         })}
       </div>
 
+      {/* RESULT */}
+      {selectedAnswer && (
+        <div className="mt-4">
+          <p className="font-semibold">
+            {selectedAnswer === translation.correct_option
+              ? "Correct ✅"
+              : "Incorrect ❌"}
+          </p>
+
+          {translation.explanation && (
+            <div className="mt-2 p-3 bg-gray-100 rounded">
+              <p className="text-sm">{translation.explanation}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* NEXT */}
       {selectedAnswer && (
         <button
           onClick={nextQuestion}
