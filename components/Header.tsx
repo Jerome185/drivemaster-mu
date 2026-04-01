@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useLanguage } from "../../contexts/LanguageContext"
+import { useLanguage } from "../app/contexts/LanguageContext"
 
 export default function Header() {
   const router = useRouter()
