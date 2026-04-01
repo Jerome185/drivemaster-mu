@@ -1,6 +1,7 @@
 "use client"
 
 export const dynamic = "force-dynamic"
+export const fetchCache = "force-no-store"
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
@@ -22,7 +23,7 @@ type Question = {
   id: number
   sign?: {
     image_url?: string
-  }[] // ✅ FIX IMPORTANT (tableau)
+  }[]
   question_translations: Translation[]
 }
 
@@ -40,6 +41,15 @@ export default function LearningSessionPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+
+  // 🔥 PROTECTION BUILD (CRITIQUE)
+  if (!categoryId) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>No category selected.</p>
+      </div>
+    )
+  }
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -77,9 +87,7 @@ export default function LearningSessionPage() {
       setLoading(false)
     }
 
-    if (categoryId) {
-      fetchQuestions()
-    }
+    fetchQuestions()
   }, [categoryId, language])
 
   if (loading) {
@@ -125,22 +133,20 @@ export default function LearningSessionPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
 
-      {/* DEBUG (optionnel) */}
+      {/* DEBUG */}
       <p className="text-xs text-gray-400 mb-2">
         UI: {language} | DB: {translation.language_code}
       </p>
 
-      {/* QUESTION COUNT */}
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
 
-      {/* QUESTION */}
       <h1 className="text-xl font-semibold mb-4">
         {translation.question_text}
       </h1>
 
-      {/* IMAGE (FIX ARRAY) */}
+      {/* IMAGE */}
       {currentQuestion.sign?.[0]?.image_url && (
         <img
           src={currentQuestion.sign[0].image_url}
