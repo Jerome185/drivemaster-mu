@@ -117,7 +117,7 @@ export default function LearningPage() {
           <button
             key={cat.name}
             onClick={() =>
-              router.push(`/learning/session?categoryId=${cat.id}`)
+              router.push(`/learning/session/${cat.id}`)
             }
             className="border p-4 rounded-lg hover:bg-gray-100 transition"
           >

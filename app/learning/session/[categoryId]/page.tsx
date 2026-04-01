@@ -1,12 +1,9 @@
 "use client"
 
-export const dynamic = "force-dynamic"
-export const fetchCache = "force-no-store"
-
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useSearchParams } from "next/navigation"
-import { useLanguage } from "../../contexts/LanguageContext"
+import { useParams } from "next/navigation"
+import { useLanguage } from "../../../contexts/LanguageContext"
 
 type Translation = {
   language_code: string
@@ -34,22 +31,13 @@ export default function LearningSessionPage() {
   )
 
   const { language } = useLanguage()
-  const searchParams = useSearchParams()
-  const categoryId = searchParams.get("categoryId")
+  const params = useParams()
+  const categoryId = params.categoryId as string
 
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-
-  // 🔥 PROTECTION BUILD (CRITIQUE)
-  if (!categoryId) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>No category selected.</p>
-      </div>
-    )
-  }
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -132,12 +120,6 @@ export default function LearningSessionPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-
-      {/* DEBUG */}
-      <p className="text-xs text-gray-400 mb-2">
-        UI: {language} | DB: {translation.language_code}
-      </p>
-
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
@@ -146,7 +128,6 @@ export default function LearningSessionPage() {
         {translation.question_text}
       </h1>
 
-      {/* IMAGE */}
       {currentQuestion.sign?.[0]?.image_url && (
         <img
           src={currentQuestion.sign[0].image_url}
@@ -155,7 +136,6 @@ export default function LearningSessionPage() {
         />
       )}
 
-      {/* OPTIONS */}
       <div className="grid gap-3">
         {["A", "B", "C", "D"].map((opt) => {
           const isCorrect = opt === translation.correct_option
@@ -180,24 +160,6 @@ export default function LearningSessionPage() {
         })}
       </div>
 
-      {/* RESULT */}
-      {selectedAnswer && (
-        <div className="mt-4">
-          <p className="font-semibold">
-            {selectedAnswer === translation.correct_option
-              ? "Correct ✅"
-              : "Incorrect ❌"}
-          </p>
-
-          {translation.explanation && (
-            <div className="mt-2 p-3 bg-gray-100 rounded">
-              <p className="text-sm">{translation.explanation}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* NEXT */}
       {selectedAnswer && (
         <button
           onClick={nextQuestion}
