@@ -62,7 +62,7 @@ export default function LearningSessionPage() {
         .eq("category_id", categoryId)
         .eq("question_translations.language_code", language.toUpperCase())
         .eq("is_active", true)
-        .limit(50)
+        .limit(10)
 
       if (error) {
         console.error("Supabase error:", error)
