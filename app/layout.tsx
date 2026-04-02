@@ -1,5 +1,5 @@
 import "./globals.css"
-import Navbar from "@/components/Navbar"
+import Header from "@/components/Header"
 import { LanguageProvider } from "@/app/contexts/LanguageContext"
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
 
         <LanguageProvider>
 
-          {/* NAVBAR FIXE */}
-          <Navbar />
+          {/* HEADER CORRECT */}
+          <Header />
 
           {/* CONTENU AVEC OFFSET */}
           <main className="pt-20">
