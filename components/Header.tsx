@@ -18,6 +18,9 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
+  // 🔥 ADMIN EMAIL (remplace par le tien)
+  const isAdmin = user?.email === "jerome.moorghen@gmail.com"
+
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -61,7 +64,14 @@ export default function Header() {
 
           {user && <Link href="/dashboard">Dashboard</Link>}
 
-          {/* LANG */}
+          {/* 🔥 ADMIN */}
+          {isAdmin && (
+            <Link href="/admin" className="text-purple-600 font-semibold">
+              Admin
+            </Link>
+          )}
+
+          {/* LANGUAGE */}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
@@ -71,24 +81,25 @@ export default function Header() {
             <option value="fr">FR</option>
           </select>
 
+          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-1 rounded"
             >
-              Logout
+              {language === "fr" ? "Déconnexion" : "Logout"}
             </button>
           ) : (
             <Link
               href="/login"
               className="bg-blue-600 text-white px-3 py-1 rounded"
             >
-              Login
+              {language === "fr" ? "Connexion" : "Login"}
             </Link>
           )}
         </div>
 
-        {/* BURGER BUTTON (MOBILE) */}
+        {/* BURGER BUTTON */}
         <button
           className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -119,7 +130,14 @@ export default function Header() {
             </Link>
           )}
 
-          {/* LANG */}
+          {/* 🔥 ADMIN MOBILE */}
+          {isAdmin && (
+            <Link href="/admin" onClick={() => setMenuOpen(false)}>
+              Admin
+            </Link>
+          )}
+
+          {/* LANGUAGE */}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
@@ -129,19 +147,21 @@ export default function Header() {
             <option value="fr">FR</option>
           </select>
 
+          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-2 rounded"
             >
-              Logout
+              {language === "fr" ? "Déconnexion" : "Logout"}
             </button>
           ) : (
             <Link
               href="/login"
+              onClick={() => setMenuOpen(false)}
               className="bg-blue-600 text-white px-3 py-2 rounded"
             >
-              Login
+              {language === "fr" ? "Connexion" : "Login"}
             </Link>
           )}
         </div>
