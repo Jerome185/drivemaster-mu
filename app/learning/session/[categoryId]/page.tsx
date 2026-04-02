@@ -77,24 +77,18 @@ export default function LearningSessionPage() {
   }, [categoryId, language])
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading questions...</p>
-      </div>
-    )
+    return <p className="text-center mt-10">Loading...</p>
   }
 
   if (questions.length === 0) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>No questions available in {language.toUpperCase()}</p>
-      </div>
+      <p className="text-center mt-10">
+        No questions available in {language.toUpperCase()}
+      </p>
     )
   }
 
   const currentQuestion = questions[currentIndex]
-
-  // 🔥 IMPORTANT : on prend directement la première (déjà filtrée en DB)
   const translation = currentQuestion.question_translations[0]
 
   const handleAnswer = (answer: string) => {
@@ -121,17 +115,14 @@ export default function LearningSessionPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
 
-      {/* COUNT */}
       <p className="text-sm text-gray-500 mb-2">
         Question {currentIndex + 1} / {questions.length}
       </p>
 
-      {/* QUESTION */}
       <h1 className="text-xl font-semibold mb-4">
         {translation.question_text}
       </h1>
 
-      {/* IMAGE */}
       {currentQuestion.sign?.image_url && (
         <img
           src={currentQuestion.sign.image_url}
@@ -140,7 +131,6 @@ export default function LearningSessionPage() {
         />
       )}
 
-      {/* OPTIONS */}
       <div className="grid gap-3">
         {["A", "B", "C", "D"].map((opt) => {
           const isCorrect = opt === translation.correct_option
@@ -165,7 +155,6 @@ export default function LearningSessionPage() {
         })}
       </div>
 
-      {/* RESULT */}
       {selectedAnswer && (
         <div className="mt-4">
           <p className="font-semibold">
@@ -182,7 +171,6 @@ export default function LearningSessionPage() {
         </div>
       )}
 
-      {/* NEXT */}
       {selectedAnswer && (
         <button
           onClick={nextQuestion}

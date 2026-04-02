@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useLanguage } from "../contexts/LanguageContext"
 
 type Category = {
-  id: number
+  id: string
   name: string
 }
 
@@ -16,112 +16,71 @@ export default function LearningPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const router = useRouter()
   const { language } = useLanguage()
+  const router = useRouter()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
-
-  // 🔥 NORMALISATION (clé du problème)
-  const normalizeCategory = (name: string) => {
-    const map: Record<string, string> = {
-      "Motorway": "Autoroute",
-      "Road Signs": "Signalisation",
-      "Round About": "Ronds-points",
-      "Roundabout": "Ronds-points",
-      "Road Safety": "Sécurité routière",
-      "Parking": "Stationnement",
-      "Right of Way": "Priorités",
-      "Traffic Rules": "Infractions & règles générales",
-    }
-
-    return map[name] || name
-  }
-
-  // 🔥 TRADUCTION UI
-  const translateCategory = (name: string) => {
-    const map: Record<string, string> = {
-      "Signalisation": "Road Signs",
-      "Stationnement": "Parking",
-      "Sécurité routière": "Road Safety",
-      "Ronds-points": "Roundabout",
-      "Autoroute": "Motorway",
-      "Priorités": "Right of Way",
-      "Infractions & règles générales": "Traffic Rules",
-    }
-
-    return language === "fr" ? name : map[name] || name
-  }
 
   useEffect(() => {
     const fetchCategories = async () => {
       setLoading(true)
 
+      // 🔥 On récupère les catégories via les questions + langue
       const { data, error } = await supabase
-        .from("categories")
-        .select("id, name")
-        .order("name")
+        .from("questions")
+        .select(`
+          categories (id, name),
+          question_translations!inner (language_code)
+        `)
+        .eq("question_translations.language_code", language.toUpperCase())
+        .eq("is_active", true)
 
       if (error) {
         console.error("Error fetching categories:", error)
       } else {
-        // ✅ 1. normaliser
-        const normalized = (data || []).map((cat) => ({
-          ...cat,
-          name: normalizeCategory(cat.name),
-        }))
+        // 🔥 UNIQUE categories
+        const uniqueMap = new Map<string, Category>()
 
-        // ✅ 2. supprimer doublons
-        const unique = Array.from(
-          new Map(normalized.map((c) => [c.name, c])).values()
-        )
+        data?.forEach((item: any) => {
+          const cat = item.categories
+          if (cat && !uniqueMap.has(cat.id)) {
+            uniqueMap.set(cat.id, cat)
+          }
+        })
 
-        setCategories(unique)
+        setCategories(Array.from(uniqueMap.values()))
       }
 
       setLoading(false)
     }
 
     fetchCategories()
-  }, [])
+  }, [language])
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading categories...</p>
-      </div>
-    )
+    return <p className="text-center mt-10">Loading...</p>
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6 text-center">
-      <h1 className="text-3xl font-bold mb-2">
+
+      <h1 className="text-3xl font-bold mb-4">
         {language === "fr" ? "Mode Apprentissage 🧠" : "Learning Mode 🧠"}
       </h1>
 
-      <p className="text-gray-600 mb-6">
-        {language === "fr"
-          ? "Entraînez-vous progressivement et améliorez votre confiance."
-          : "Practice step by step and build your confidence."}
+      <p className="text-gray-500 mb-6">
+        {categories.length} {language === "fr" ? "catégories disponibles" : "categories available"}
       </p>
 
-      <p className="text-sm text-gray-400 mb-6">
-        {categories.length}{" "}
-        {language === "fr"
-          ? "catégories disponibles"
-          : "categories available"}
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {categories.map((cat) => (
           <button
-            key={cat.name}
-            onClick={() =>
-              router.push(`/learning/session/${cat.id}`)
-            }
+            key={cat.id}
+            onClick={() => router.push(`/learning/session/${cat.id}`)}
             className="border p-4 rounded-lg hover:bg-gray-100 transition"
           >
-            {translateCategory(cat.name)}
+            {cat.name}
           </button>
         ))}
       </div>
