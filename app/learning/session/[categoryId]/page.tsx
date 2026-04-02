@@ -48,7 +48,7 @@ export default function LearningSessionPage() {
         .select(`
           id,
           sign:sign_id (image_url),
-          question_translations (
+          question_translations!inner (
             language_code,
             question_text,
             option_a,
@@ -60,8 +60,9 @@ export default function LearningSessionPage() {
           )
         `)
         .eq("category_id", categoryId)
+        .eq("question_translations.language_code", language.toUpperCase())
         .eq("is_active", true)
-        .limit(100)
+        .limit(50)
 
       if (error) {
         console.error("Supabase error:", error)
@@ -73,7 +74,7 @@ export default function LearningSessionPage() {
     }
 
     fetchQuestions()
-  }, [categoryId])
+  }, [categoryId, language])
 
   if (loading) {
     return (
@@ -86,27 +87,15 @@ export default function LearningSessionPage() {
   if (questions.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p>No questions found.</p>
+        <p>No questions available in {language.toUpperCase()}</p>
       </div>
     )
   }
 
   const currentQuestion = questions[currentIndex]
 
-  // 🔥 FIX FINAL LANGUE (robuste)
-  const lang = language.toLowerCase()
-
-  const translation = currentQuestion.question_translations.find(
-    (t) => t.language_code?.trim().toLowerCase() === lang
-  )
-
-  if (!translation) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>No questions available in {language.toUpperCase()}</p>
-      </div>
-    )
-  }
+  // 🔥 IMPORTANT : on prend directement la première (déjà filtrée en DB)
+  const translation = currentQuestion.question_translations[0]
 
   const handleAnswer = (answer: string) => {
     setSelectedAnswer(answer)
