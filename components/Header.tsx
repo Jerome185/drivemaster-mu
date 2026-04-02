@@ -16,6 +16,7 @@ export default function Header() {
   )
 
   const [user, setUser] = useState<any>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -37,59 +38,114 @@ export default function Header() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.refresh()
     router.push("/login")
   }
 
   return (
-    <header className="flex flex-col md:flex-row justify-between items-center px-4 md:px-8 py-3 bg-gray-100 shadow-sm">
+    <header className="bg-gray-100 shadow-sm">
 
-      {/* LOGO */}
-      <Link href="/" className="font-bold text-lg md:text-xl text-blue-700">
-        DriveMaster MU 🚗
-      </Link>
+      {/* TOP BAR */}
+      <div className="flex justify-between items-center px-4 py-3">
 
-      {/* NAVIGATION */}
-      <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mt-2 md:mt-0 text-sm">
+        {/* LOGO */}
+        <Link href="/" className="font-bold text-lg text-blue-700">
+          DriveMaster MU 🚗
+        </Link>
 
-        {/* MAIN NAV */}
-        <Link href="/learning">Learning</Link>
-        <Link href="/official">Official</Link>
-        <Link href="/master">Master</Link>
+        {/* DESKTOP NAV */}
+        <div className="hidden md:flex items-center gap-6">
 
-        {user && (
-          <Link href="/dashboard" className="text-blue-700 font-semibold">
-            {language === "fr" ? "Tableau de bord" : "Dashboard"}
-          </Link>
-        )}
+          <Link href="/learning">Learning</Link>
+          <Link href="/official">Official</Link>
+          <Link href="/master">Master</Link>
 
-        {/* LANGUAGE SWITCH */}
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
-          className="border rounded px-2 py-1 text-xs"
+          {user && <Link href="/dashboard">Dashboard</Link>}
+
+          {/* LANG */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+          </select>
+
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-3 py-1 rounded"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-blue-600 text-white px-3 py-1 rounded"
+            >
+              Login
+            </Link>
+          )}
+        </div>
+
+        {/* BURGER BUTTON (MOBILE) */}
+        <button
+          className="md:hidden text-2xl"
+          onClick={() => setMenuOpen(!menuOpen)}
         >
-          <option value="en">EN</option>
-          <option value="fr">FR</option>
-        </select>
-
-        {/* AUTH */}
-        {user ? (
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs"
-          >
-            {language === "fr" ? "Déconnexion" : "Logout"}
-          </button>
-        ) : (
-          <Link
-            href="/login"
-            className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs"
-          >
-            {language === "fr" ? "Connexion" : "Login"}
-          </Link>
-        )}
+          ☰
+        </button>
       </div>
+
+      {/* MOBILE MENU */}
+      {menuOpen && (
+        <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t">
+
+          <Link href="/learning" onClick={() => setMenuOpen(false)}>
+            Learning
+          </Link>
+
+          <Link href="/official" onClick={() => setMenuOpen(false)}>
+            Official
+          </Link>
+
+          <Link href="/master" onClick={() => setMenuOpen(false)}>
+            Master
+          </Link>
+
+          {user && (
+            <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
+              Dashboard
+            </Link>
+          )}
+
+          {/* LANG */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+          </select>
+
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-3 py-2 rounded"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-blue-600 text-white px-3 py-2 rounded"
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   )
 }
