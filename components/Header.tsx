@@ -8,7 +8,7 @@ import { useLanguage } from "../app/contexts/LanguageContext"
 
 export default function Header() {
   const router = useRouter()
-  const { language } = useLanguage()
+  const { language, setLanguage } = useLanguage()
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -42,36 +42,53 @@ export default function Header() {
   }
 
   return (
-    <header className="flex justify-between items-center px-8 py-4 bg-gray-100 shadow-sm">
+    <header className="flex flex-col md:flex-row justify-between items-center px-4 md:px-8 py-3 bg-gray-100 shadow-sm">
 
-      <Link href="/" className="font-bold text-xl text-blue-700">
+      {/* LOGO */}
+      <Link href="/" className="font-bold text-lg md:text-xl text-blue-700">
         DriveMaster MU 🚗
       </Link>
 
-      <div className="flex items-center gap-6">
+      {/* NAVIGATION */}
+      <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mt-2 md:mt-0 text-sm">
 
+        {/* MAIN NAV */}
+        <Link href="/learning">Learning</Link>
+        <Link href="/official">Official</Link>
+        <Link href="/master">Master</Link>
+
+        {user && (
+          <Link href="/dashboard" className="text-blue-700 font-semibold">
+            {language === "fr" ? "Tableau de bord" : "Dashboard"}
+          </Link>
+        )}
+
+        {/* LANGUAGE SWITCH */}
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
+          className="border rounded px-2 py-1 text-xs"
+        >
+          <option value="en">EN</option>
+          <option value="fr">FR</option>
+        </select>
+
+        {/* AUTH */}
         {user ? (
-          <>
-            <Link href="/dashboard" className="text-blue-700 font-semibold">
-              {language === "fr" ? "Tableau de bord" : "Dashboard"}
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg"
-            >
-              {language === "fr" ? "Déconnexion" : "Logout"}
-            </button>
-          </>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs"
+          >
+            {language === "fr" ? "Déconnexion" : "Logout"}
+          </button>
         ) : (
           <Link
             href="/login"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs"
           >
             {language === "fr" ? "Connexion" : "Login"}
           </Link>
         )}
-
       </div>
     </header>
   )
