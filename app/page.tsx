@@ -99,11 +99,11 @@ export default function HomePage() {
       <div className="max-w-md mx-auto border rounded p-8 text-center shadow">
 
         <h3 className="text-xl font-semibold mb-2">
-          DriveMaster Premium
+          DriveMaster Premium - launch offer
         </h3>
 
         <p className="text-4xl font-bold text-blue-700 mb-2">
-          Rs 2,000
+          Rs 999
         </p>
 
         <p className="mb-4 text-gray-600">

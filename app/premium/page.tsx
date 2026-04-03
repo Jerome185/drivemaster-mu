@@ -18,7 +18,7 @@ export default function PremiumPage(){
   const prices:any = {
     "1m": 500,
     "3m": 1200,
-    "lifetime": 2000
+    "lifetime": 999
   }
 
   const submitPayment = async()=>{
