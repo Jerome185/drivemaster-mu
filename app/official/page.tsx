@@ -106,7 +106,7 @@ export default function OfficialPage(){
         </p>
 
         <Link
-        href="/login?redirect=/premium">
+        href="/premium">
           className="bg-yellow-600 text-white px-6 py-3 rounded"
         >
           Upgrade to Premium
