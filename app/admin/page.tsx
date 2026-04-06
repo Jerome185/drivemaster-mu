@@ -48,8 +48,7 @@ export default function AdminPage(){
   const { data, error } = await supabase
   .from("payments")
   .select(`
-    *,
-    users(email)
+    *
   `)
   .eq("status","pending")
   .order("created_at",{ ascending:false })
