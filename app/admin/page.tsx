@@ -49,7 +49,7 @@ export default function AdminPage(){
         *,
         users(email)
       `)
-      .eq("status","pending")
+      .ilike("status","pending")
       .order("created_at",{ ascending:false })
 
     setPayments(data || [])
