@@ -46,8 +46,13 @@ export default function AdminPage(){
   const loadPayments = async()=>{
 
   const { data, error } = await supabase
-    .from("payments")
-    .select("*")
+  .from("payments")
+  .select(`
+    *,
+    users(email)
+  `)
+  .eq("status","pending")
+  .order("created_at",{ ascending:false })
 
   console.log("DATA:", data)
   console.log("ERROR:", error)
