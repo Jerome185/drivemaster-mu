@@ -14,12 +14,11 @@ export default function AdminPage(){
   const [loading,setLoading] = useState(true)
 
   useEffect(()=>{
-    checkAdmin()
-    loadPayments()
+    checkAdminAndLoad()
   },[])
 
-  // 🔐 Vérification admin
-  const checkAdmin = async()=>{
+  // 🔐 CHECK ADMIN + LOAD
+  const checkAdminAndLoad = async()=>{
 
     const { data:userData } = await supabase.auth.getUser()
 
@@ -37,10 +36,13 @@ export default function AdminPage(){
     if(!profile?.is_admin){
       alert("Access denied")
       window.location.href = "/"
+      return
     }
+
+    loadPayments()
   }
 
-  // 📦 Charger paiements
+  // 📦 LOAD PAYMENTS
   const loadPayments = async()=>{
 
     const { data } = await supabase
@@ -49,7 +51,7 @@ export default function AdminPage(){
         *,
         users(email)
       `)
-      .ilike("status","pending")
+      .eq("status","pending")
       .order("created_at",{ ascending:false })
 
     setPayments(data || [])
@@ -64,8 +66,7 @@ export default function AdminPage(){
       .update({ status:"approved" })
       .eq("id",p.id)
 
-    // 👉 Adapter selon plan
-    let duration = 30 // défaut 1 mois
+    let duration = 30
 
     if(p.plan === "3_months") duration = 90
     if(p.plan === "lifetime") duration = 9999
