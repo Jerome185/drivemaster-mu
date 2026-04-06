@@ -57,12 +57,13 @@ export default function PremiumPage(){
     setSubmitting(true)
 
     await supabase.from("payments").insert({
-      user_id: user.id,
-      transaction_id: transactionId,
-      amount: getPrice(),
-      plan: selectedPlan,
-      status: "pending"
-    })
+  user_id: user.id,
+  transaction_id: transactionId,
+  amount: getPrice(),
+  plan: selectedPlan,
+  payment_method: "Juice", // ✅ AJOUT ICI
+  status: "pending"
+})
 
     alert("✅ Payment submitted! Waiting for validation.")
 
