@@ -45,18 +45,21 @@ export default function AdminPage(){
   // 📦 LOAD PAYMENTS
   const loadPayments = async()=>{
 
-    const { data } = await supabase
-      .from("payments")
-      .select(`
-        *,
-        users(email)
-      `)
-      .eq("status","pending")
-      .order("created_at",{ ascending:false })
+  const { data, error } = await supabase
+    .from("payments")
+    .select(`
+      *,
+      users(email)
+    `)
+    .eq("status","pending")
+    .order("created_at",{ ascending:false })
 
-    setPayments(data || [])
-    setLoading(false)
-  }
+  console.log("DATA:", data)
+  console.log("ERROR:", error)
+
+  setPayments(data || [])
+  setLoading(false)
+}
 
   // ✅ APPROVE
   const approve = async(p:any)=>{
