@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
-import Exam from "@/components/Exam"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import Link from "next/link"
-
+import Exam from "@/components/Exam"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,64 +14,78 @@ const supabase = createBrowserClient(
 export default function OfficialPage(){
 
   const { language } = useLanguage()
-  const router = useRouter()
 
   const [user,setUser] = useState<any>(null)
   const [profile,setProfile] = useState<any>(null)
   const [questions,setQuestions] = useState<any[]>([])
   const [loading,setLoading] = useState(true)
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const loadData = async ()=>{
+    const loadData = async () => {
 
-      // 🔐 USER
-      const { data:userData } = await supabase.auth.getUser()
+      try {
 
-      if(!userData.user){
+        // 🔐 USER
+        const { data:userData } = await supabase.auth.getUser()
+
+        if(!userData.user){
+          setLoading(false)
+          return
+        }
+
+        setUser(userData.user)
+
+        // 👤 PROFILE
+        let { data:profileData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", userData.user.id)
+          .single()
+
+        // 🔥 AUTO CREATE PROFILE SI MANQUANT
+        if(!profileData){
+          const { data:newProfile } = await supabase
+            .from("users")
+            .insert({
+              id: userData.user.id,
+              email: userData.user.email,
+              is_premium: false
+            })
+            .select()
+            .single()
+
+          profileData = newProfile
+        }
+
+        setProfile(profileData)
+
+        // 💰 SI PREMIUM → LOAD QUESTIONS
+        if(profileData?.is_premium){
+
+          const { data, error } = await supabase.rpc(
+            "get_official_exam_questions",
+            { lang: language }
+          )
+
+          if(error){
+            console.error("RPC ERROR:", error)
+            setQuestions([])
+          } else {
+            setQuestions(data || [])
+          }
+        }
+
+      } catch(err){
+        console.error("LOAD ERROR:", err)
+      } finally {
         setLoading(false)
-        return
       }
-
-      setUser(userData.user)
-
-      // 👤 PROFILE
-      const { data:profileData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userData.user.id)
-        .single()
-
-      // ⚠️ SI PROFIL N’EXISTE PAS → éviter crash
-      if(!profileData){
-        setProfile(null)
-        setLoading(false)
-        return
-      }
-
-      setProfile(profileData)
-
-      // 💰 CHECK PREMIUM
-      if(profileData.is_premium){
-
-        const { data, error } = await supabase.rpc(
-  "get_official_exam_questions",
-  { lang: language }
-)
-
-if(error){
-  console.error(error)
-  setQuestions([])
-} else {
-  setQuestions(data || [])
-}
-
-      setLoading(false)
     }
 
     loadData()
 
-  },[language])
+  }, [language])
 
   // ⏳ LOADING
   if(loading){
@@ -97,7 +109,7 @@ if(error){
         </p>
 
         <Link
-          href="/login?redirect=/official"
+          href="/login"
           className="bg-blue-600 text-white px-6 py-3 rounded"
         >
           Login
@@ -106,25 +118,8 @@ if(error){
     )
   }
 
-  // ⚠️ PROFILE MANQUANT (TRÈS IMPORTANT POUR TON BUG ACTUEL)
-  if(!profile){
-    return(
-      <div className="max-w-xl mx-auto p-10 text-center">
-
-        <h1 className="text-2xl font-bold mb-4">
-          Setting up your account...
-        </h1>
-
-        <p>
-          Please refresh the page or try again.
-        </p>
-
-      </div>
-    )
-  }
-
   // ❌ NOT PREMIUM
-  if(!profile.is_premium){
+  if(!profile?.is_premium){
     return(
       <div className="max-w-xl mx-auto p-10 text-center">
 
@@ -147,19 +142,22 @@ if(error){
     )
   }
 
-  // ✅ PREMIUM USER
+  // ❌ NO QUESTIONS (anti-crash)
+  if(!questions || questions.length === 0){
+    return(
+      <div className="p-10 text-center">
+        No questions available for this language.
+      </div>
+    )
+  }
+
+  // ✅ OK
   return(
     <div className="max-w-4xl mx-auto p-8">
 
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-800">
         Official Exam Mode 🟢
       </h1>
-
-      {questions.length === 0 && (
-        <p className="text-center mb-4">
-          Loading questions...
-        </p>
-      )}
 
       <div className="flex justify-center">
         <Exam
@@ -172,4 +170,3 @@ if(error){
   )
 
 }
-
