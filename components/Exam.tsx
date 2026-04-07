@@ -163,7 +163,7 @@ const correct = [...correctOptions]
   // SELECT
   const handleSelect = (option: string) => {
 
-    if (examFinished) return
+    if (examFinished || showResult) return
 
     if (!isMultiple) {
       setSelected([option])
