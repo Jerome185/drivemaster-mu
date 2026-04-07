@@ -48,7 +48,9 @@ export default function Exam({
   const currentQuestion = questions?.[currentIndex]
 
   // 🧠 MULTI
-  const correctOptions = currentQuestion?.correct_option?.split(",") || []
+  const correctOptions = currentQuestion.correct_option
+  .split(",")
+  .map(opt => opt.trim().toUpperCase()) || []
   const isMultiple = correctOptions.length > 1
 
   // 🔐 PROFILE
@@ -139,8 +141,15 @@ export default function Exam({
   // 🧠 VALIDATION
   const validateAnswer = (answers: string[]) => {
 
-    const correct = [...correctOptions].sort().join(",")
-    const user = [...answers].sort().join(",")
+    const user = [...answers]
+  .map(a => a.trim().toUpperCase())
+  .sort()
+  .join(",")
+
+const correct = [...correctOptions]
+  .map(a => a.trim().toUpperCase())
+  .sort()
+  .join(",")
 
     const isCorrect = correct === user
 
