@@ -83,17 +83,20 @@ export default function MasterPage(){
 
   return(
     <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
+      <h1 className="text-3xl font-bold text-center mb-6 text-red-800">
         Master Mode 🔥
       </h1>
-
+      
       {profile?.premium_expires_at && (
         <p className="text-orange-500 text-center mb-4">
           Premium pending validation ⏳
         </p>
       )}
 
+      <div className="flex justify-center">
       <Exam questions={questions} isMaster={true}/>
+    </div>
+    
     </div>
   )
 }
