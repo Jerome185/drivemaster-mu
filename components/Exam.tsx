@@ -30,70 +30,51 @@ export default function Exam({
   isMaster?: boolean
 }) {
 
-  // 🔥 PROTECTION CRITIQUE
-  if (!questions || questions.length === 0) {
-    return (
-      <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
-        <p>No questions available.</p>
-      </div>
-    )
-  }
+  // 🔐 USER STATE
+  const [isPremium, setIsPremium] = useState(false)
+  const [premiumStatus, setPremiumStatus] = useState<"pending" | "active" | "rejected" | null>(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
 
+  // 🎮 EXAM STATE
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [examFinished, setExamFinished] = useState(false)
 
-  const [isPremium, setIsPremium] = useState(false)
-
   const timePerQuestion = isMaster ? 30 : 60
   const [timeLeft, setTimeLeft] = useState(timePerQuestion)
 
-  const currentQuestion = questions[currentIndex]
-
-  // 🔥 PROTECTION
-  if (!currentQuestion) {
-    return <div className="p-10 text-center">Loading question...</div>
-  }
-
-  const totalPossibleScore = (questions || []).reduce(
-    (sum, q) => sum + (q.weight || 0),
-    0
-  )
-
-  const percentage =
-    totalPossibleScore > 0
-      ? Math.round((score / totalPossibleScore) * 100)
-      : 0
-
-  const passThreshold = isMaster ? 85 : 70
-  const passed = percentage >= passThreshold
+  const currentQuestion = questions?.[currentIndex]
 
   // 🔐 LOAD USER PROFILE
   useEffect(() => {
-
     const loadProfile = async () => {
 
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
+      if (!session) {
+        setLoadingProfile(false)
+        return
+      }
 
       const { data } = await supabase
         .from("users")
-        .select("is_premium, premium_expires_at")
+        .select("is_premium, premium_expires_at, premium_status")
         .eq("id", session.user.id)
         .single()
 
       const isPremiumValid =
         data?.is_premium &&
+        data?.premium_status === "active" &&
         (!data?.premium_expires_at ||
           new Date(data.premium_expires_at) > new Date())
 
       setIsPremium(isPremiumValid)
+      setPremiumStatus(data?.premium_status || null)
+      setLoadingProfile(false)
     }
 
     loadProfile()
-
   }, [])
 
   // ⏱ TIMER RESET
@@ -119,10 +100,69 @@ export default function Exam({
 
   }, [timeLeft, examFinished])
 
+  // 🛑 LOADING PROFILE
+  if (loadingProfile) {
+    return <div className="p-10 text-center">Loading...</div>
+  }
+
+  // 🔒 BLOQUAGE MASTER SI PAS PREMIUM
+  if (isMaster && !isPremium) {
+    return (
+      <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
+
+        <h2 className="text-xl font-bold mb-4">🔒 Premium required</h2>
+
+        {premiumStatus === "pending" && (
+          <p className="text-orange-500">
+            Payment under validation ⏳
+          </p>
+        )}
+
+        {premiumStatus === "rejected" && (
+          <p className="text-red-500">
+            Payment rejected ❌
+          </p>
+        )}
+
+        {!premiumStatus && (
+          <p>Please upgrade to access this mode.</p>
+        )}
+
+        <button
+          onClick={() => window.location.href = "/premium"}
+          className="mt-4 bg-blue-900 text-white px-4 py-2 rounded"
+        >
+          Upgrade
+        </button>
+
+      </div>
+    )
+  }
+
+  // 🔥 PROTECTION QUESTIONS
+  if (!questions || questions.length === 0 || !currentQuestion) {
+    return (
+      <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
+        <p>No questions available.</p>
+      </div>
+    )
+  }
+
+  const totalPossibleScore = questions.reduce(
+    (sum, q) => sum + (q.weight || 0),
+    0
+  )
+
+  const percentage =
+    totalPossibleScore > 0
+      ? Math.round((score / totalPossibleScore) * 100)
+      : 0
+
+  const passThreshold = isMaster ? 85 : 70
+  const passed = percentage >= passThreshold
+
   // 🧠 UPDATE USER STATS
   const updateStats = async (isCorrect: boolean) => {
-
-    if (!currentQuestion) return
 
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
@@ -160,10 +200,10 @@ export default function Exam({
     }
   }
 
-  // ✅ SELECT ANSWER
+  // ✅ SELECT
   const handleSelect = (option: string) => {
 
-    if (selected || examFinished || !currentQuestion) return
+    if (selected || examFinished) return
 
     setSelected(option)
     setShowResult(true)
@@ -177,7 +217,7 @@ export default function Exam({
     }
   }
 
-  // 🔒 NEXT QUESTION
+  // 🔒 NEXT QUESTION + LIMIT FREE
   const handleNext = async () => {
 
     const { data: { session } } = await supabase.auth.getSession()
@@ -187,7 +227,7 @@ export default function Exam({
 
     const { data: user } = await supabase
       .from("users")
-      .select("daily_questions_count, last_question_date, is_premium, premium_expires_at")
+      .select("daily_questions_count, last_question_date, is_premium, premium_expires_at, premium_status")
       .eq("id", userId)
       .single()
 
@@ -201,6 +241,7 @@ export default function Exam({
 
     const isPremiumValid =
       user?.is_premium &&
+      user?.premium_status === "active" &&
       (!user?.premium_expires_at ||
         new Date(user.premium_expires_at) > new Date())
 
