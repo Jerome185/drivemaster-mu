@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
+import { useRouter } from "next/navigation"
 import Exam from "@/components/Exam"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import Link from "next/link"
@@ -14,35 +15,45 @@ const supabase = createBrowserClient(
 export default function OfficialPage(){
 
   const { language } = useLanguage()
+  const router = useRouter()
 
+  const [user,setUser] = useState<any>(null)
+  const [profile,setProfile] = useState<any>(null)
   const [questions,setQuestions] = useState<any[]>([])
   const [loading,setLoading] = useState(true)
-  const [isPremium,setIsPremium] = useState(false)
-  const [user,setUser] = useState<any>(null) // ✅ AJOUT
 
   useEffect(()=>{
 
     const loadData = async ()=>{
 
+      // 🔐 USER
       const { data:userData } = await supabase.auth.getUser()
-
-      // ✅ stocker user
-      setUser(userData.user)
 
       if(!userData.user){
         setLoading(false)
         return
       }
 
-      const { data:profile } = await supabase
+      setUser(userData.user)
+
+      // 👤 PROFILE
+      const { data:profileData } = await supabase
         .from("users")
-        .select("is_premium")
-        .eq("id",userData.user.id)
+        .select("*")
+        .eq("id", userData.user.id)
         .single()
 
-      setIsPremium(profile?.is_premium)
+      // ⚠️ SI PROFIL N’EXISTE PAS → éviter crash
+      if(!profileData){
+        setProfile(null)
+        setLoading(false)
+        return
+      }
 
-      if(profile?.is_premium){
+      setProfile(profileData)
+
+      // 💰 CHECK PREMIUM
+      if(profileData.is_premium){
 
         const { data } = await supabase.rpc(
           "get_official_exam_questions",
@@ -50,18 +61,16 @@ export default function OfficialPage(){
         )
 
         setQuestions(data || [])
-
       }
 
       setLoading(false)
-
     }
 
     loadData()
 
   },[language])
 
-  // ⏳ Loading
+  // ⏳ LOADING
   if(loading){
     return(
       <div className="p-10 text-center">
@@ -70,7 +79,7 @@ export default function OfficialPage(){
     )
   }
 
-  // ❌ NOT LOGGED IN → LOGIN
+  // ❌ NOT LOGGED IN
   if(!user){
     return(
       <div className="max-w-xl mx-auto p-10 text-center">
@@ -83,7 +92,7 @@ export default function OfficialPage(){
         </p>
 
         <Link
-          href="/login"
+          href="/login?redirect=/official"
           className="bg-blue-600 text-white px-6 py-3 rounded"
         >
           Login
@@ -92,8 +101,25 @@ export default function OfficialPage(){
     )
   }
 
-  // ❌ NOT PREMIUM → PAYWALL
-  if(!isPremium){
+  // ⚠️ PROFILE MANQUANT (TRÈS IMPORTANT POUR TON BUG ACTUEL)
+  if(!profile){
+    return(
+      <div className="max-w-xl mx-auto p-10 text-center">
+
+        <h1 className="text-2xl font-bold mb-4">
+          Setting up your account...
+        </h1>
+
+        <p>
+          Please refresh the page or try again.
+        </p>
+
+      </div>
+    )
+  }
+
+  // ❌ NOT PREMIUM
+  if(!profile.is_premium){
     return(
       <div className="max-w-xl mx-auto p-10 text-center">
 
@@ -116,13 +142,19 @@ export default function OfficialPage(){
     )
   }
 
-  // ✅ PREMIUM USER → EXAM
+  // ✅ PREMIUM USER
   return(
     <div className="max-w-4xl mx-auto p-8">
 
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-800">
         Official Exam Mode 🟢
       </h1>
+
+      {questions.length === 0 && (
+        <p className="text-center mb-4">
+          Loading questions...
+        </p>
+      )}
 
       <div className="flex justify-center">
         <Exam
