@@ -65,7 +65,7 @@ export default function OfficialPage(){
 
           const { data, error } = await supabase.rpc(
             "get_official_exam_questions",
-            { lang: language }
+            { lang: language.toUpperCase() }
           )
 
           if(error){

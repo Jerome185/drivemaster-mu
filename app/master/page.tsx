@@ -54,7 +54,7 @@ export default function MasterPage(){
 
       const { data } = await supabase.rpc(
         "get_master_exam_questions",
-        { lang: language }
+        { lang: language.toUpperCase() }
       )
 
       setQuestions(data || [])
