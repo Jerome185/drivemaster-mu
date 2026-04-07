@@ -7,6 +7,7 @@ import Exam from "@/components/Exam"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import Link from "next/link"
 
+
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -55,13 +56,17 @@ export default function OfficialPage(){
       // 💰 CHECK PREMIUM
       if(profileData.is_premium){
 
-        const { data } = await supabase.rpc(
-          "get_official_exam_questions",
-          { lang: language }
-        )
+        const { data, error } = await supabase.rpc(
+  "get_official_exam_questions",
+  { lang: language }
+)
 
-        setQuestions(data || [])
-      }
+if(error){
+  console.error(error)
+  setQuestions([])
+} else {
+  setQuestions(data || [])
+}
 
       setLoading(false)
     }
@@ -167,3 +172,4 @@ export default function OfficialPage(){
   )
 
 }
+
