@@ -30,6 +30,15 @@ export default function Exam({
   isMaster?: boolean
 }) {
 
+  // 🔥 PROTECTION CRITIQUE
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
+        <p>No questions available.</p>
+      </div>
+    )
+  }
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
@@ -43,12 +52,21 @@ export default function Exam({
 
   const currentQuestion = questions[currentIndex]
 
-  const totalPossibleScore = questions.reduce(
-    (sum, q) => sum + q.weight,
+  // 🔥 PROTECTION
+  if (!currentQuestion) {
+    return <div className="p-10 text-center">Loading question...</div>
+  }
+
+  const totalPossibleScore = (questions || []).reduce(
+    (sum, q) => sum + (q.weight || 0),
     0
   )
 
-  const percentage = Math.round((score / totalPossibleScore) * 100)
+  const percentage =
+    totalPossibleScore > 0
+      ? Math.round((score / totalPossibleScore) * 100)
+      : 0
+
   const passThreshold = isMaster ? 85 : 70
   const passed = percentage >= passThreshold
 
@@ -104,6 +122,8 @@ export default function Exam({
   // 🧠 UPDATE USER STATS
   const updateStats = async (isCorrect: boolean) => {
 
+    if (!currentQuestion) return
+
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
 
@@ -143,7 +163,7 @@ export default function Exam({
   // ✅ SELECT ANSWER
   const handleSelect = (option: string) => {
 
-    if (selected || examFinished) return
+    if (selected || examFinished || !currentQuestion) return
 
     setSelected(option)
     setShowResult(true)
@@ -153,11 +173,11 @@ export default function Exam({
     updateStats(isCorrect)
 
     if (isCorrect) {
-      setScore(prev => prev + currentQuestion.weight)
+      setScore(prev => prev + (currentQuestion.weight || 0))
     }
   }
 
-  // 🔒 NEXT QUESTION (FREE LIMIT)
+  // 🔒 NEXT QUESTION
   const handleNext = async () => {
 
     const { data: { session } } = await supabase.auth.getSession()
@@ -208,7 +228,7 @@ export default function Exam({
     }
   }
 
-  // 🏁 RESULT SCREEN
+  // 🏁 RESULT
   if (examFinished) {
     return (
       <div className="max-w-xl w-full border p-8 rounded shadow bg-white text-center">
