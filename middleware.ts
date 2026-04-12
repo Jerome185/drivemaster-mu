@@ -1,3 +1,5 @@
+"use server"
+
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
@@ -23,7 +25,6 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  // 🔐 SESSION
   const { data: { session } } = await supabase.auth.getSession()
 
   const pathname = req.nextUrl.pathname
@@ -33,8 +34,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/signup")
 
   const isProtected =
-    pathname.startsWith("/master") ||
-    pathname.startsWith("/dashboard")
+    pathname.startsWith("/official") ||
+    pathname.startsWith("/master")
 
   // =========================
   // 🚫 NOT LOGGED IN
@@ -51,24 +52,36 @@ export async function middleware(req: NextRequest) {
   }
 
   // =========================
-  // 🔥 PREMIUM CHECK (MASTER)
+  // 🔐 PLAN CHECK
   // =========================
-  if (session && pathname.startsWith("/master")) {
+  if (session && (pathname.startsWith("/official") || pathname.startsWith("/master"))) {
 
     const { data: user } = await supabase
       .from("users")
-      .select("is_premium, premium_status")
+      .select("plan")
       .eq("id", session.user.id)
       .single()
 
-    const isPremium =
-      user?.is_premium &&
-      user?.premium_status === "active"
+    // ❌ FREE → pas accès official/master
+    if (user?.plan === "free") {
+      return NextResponse.redirect(new URL("/premium", req.url))
+    }
 
-    if (!isPremium) {
+    // ❌ OFFICIAL → pas accès master
+    if (pathname.startsWith("/master") && user?.plan !== "master") {
       return NextResponse.redirect(new URL("/premium", req.url))
     }
   }
 
   return res
+}
+
+// ⚙️ ROUTES PROTÉGÉES
+export const config = {
+  matcher: [
+    "/official/:path*",
+    "/master/:path*",
+    "/login",
+    "/signup"
+  ],
 }
