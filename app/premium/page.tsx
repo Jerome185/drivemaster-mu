@@ -2,146 +2,139 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function PremiumPage(){
+export default function PremiumPage() {
 
-  const router = useRouter()
+  const [plan, setPlan] = useState<"free" | "official" | "master" | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const [user,setUser] = useState<any>(null)
-  const [loading,setLoading] = useState(true)
+  useEffect(() => {
 
-  const [selectedPlan,setSelectedPlan] = useState("lifetime")
-  const [transactionId,setTransactionId] = useState("")
-  const [submitting,setSubmitting] = useState(false)
+    const loadProfile = async () => {
 
-  useEffect(()=>{
+      const { data: { session } } = await supabase.auth.getSession()
 
-    const checkUser = async () => {
-
-      const { data } = await supabase.auth.getUser()
-
-      if(!data.user){
-        router.push("/login?redirect=/premium")
+      if (!session) {
+        setLoading(false)
         return
       }
 
-      setUser(data.user)
+      const { data } = await supabase
+        .from("users")
+        .select("plan")
+        .eq("id", session.user.id)
+        .single()
+
+      setPlan(data?.plan || "free")
       setLoading(false)
     }
 
-    checkUser()
+    loadProfile()
 
-  },[])
+  }, [])
 
-  // 💰 PRIX PAR PLAN
-  const getPrice = () => {
-    if(selectedPlan === "1_month") return 500
-    if(selectedPlan === "3_months") return 1200
-    return 999 // lifetime
-  }
-
-  // 🚀 SUBMIT PAYMENT
-  const submitPayment = async () => {
-
-    if(!transactionId){
-      alert("Please enter transaction ID")
-      return
-    }
-
-    setSubmitting(true)
-
-    await supabase.from("payments").insert({
-  user_id: user.id,
-  transaction_id: transactionId,
-  amount: getPrice(),
-  plan: selectedPlan,
-  payment_method: "Juice", // ✅ AJOUT ICI
-  status: "pending"
-})
-
-    alert("✅ Payment submitted! Waiting for validation.")
-
-    router.push("/subscription")
-  }
-
-  if(loading){
+  if (loading) {
     return <div className="p-10 text-center">Loading...</div>
   }
 
-  return(
+  return (
+    <div className="max-w-5xl mx-auto p-8">
 
-    <div className="max-w-xl mx-auto p-10 text-center">
-
-      <h1 className="text-3xl font-bold mb-6">
-        Upgrade to Premium 🚀
+      {/* HEADER */}
+      <h1 className="text-4xl font-bold text-center mb-4">
+        Upgrade Your Driving Skills 🚗
       </h1>
 
+      <p className="text-center text-gray-600 mb-10">
+        Pass your driving test faster with DriveMaster
+      </p>
+
       {/* PLANS */}
-      <div className="space-y-4 mb-6">
+      <div className="grid md:grid-cols-2 gap-6">
 
-        <div
-          onClick={()=>setSelectedPlan("1_month")}
-          className={`border p-4 cursor-pointer rounded ${
-            selectedPlan === "1_month" ? "bg-blue-100" : ""
-          }`}
-        >
-          <h2>1 Month</h2>
-          <p>Rs 500</p>
+        {/* ===================== */}
+        {/* OFFICIAL PLAN */}
+        {/* ===================== */}
+        <div className="border rounded-xl p-6 shadow">
+
+          <h2 className="text-2xl font-bold mb-2">Official</h2>
+          <p className="text-gray-500 mb-4">Perfect for beginners</p>
+
+          <p className="text-3xl font-bold mb-4">Rs 999</p>
+
+          <ul className="space-y-2 mb-6">
+            <li>✅ Unlimited Official questions</li>
+            <li>✅ Practice anytime</li>
+            <li>✅ Improve your basics</li>
+            <li>❌ Master mode</li>
+          </ul>
+
+          {plan === "official" || plan === "master" ? (
+            <button className="w-full bg-gray-300 py-2 rounded cursor-not-allowed">
+              Current Plan
+            </button>
+          ) : (
+            <button
+              className="w-full bg-blue-900 text-white py-2 rounded"
+              onClick={() => alert("TODO: payment official")}
+            >
+              Upgrade to Official
+            </button>
+          )}
+
         </div>
 
-        <div
-          onClick={()=>setSelectedPlan("3_months")}
-          className={`border p-4 cursor-pointer rounded ${
-            selectedPlan === "3_months" ? "bg-blue-100" : ""
-          }`}
-        >
-          <h2>3 Months</h2>
-          <p>Rs 1200</p>
-        </div>
+        {/* ===================== */}
+        {/* MASTER PLAN */}
+        {/* ===================== */}
+        <div className="border-2 border-red-600 rounded-xl p-6 shadow-lg">
 
-        <div
-          onClick={()=>setSelectedPlan("lifetime")}
-          className={`border p-4 cursor-pointer rounded ${
-            selectedPlan === "lifetime" ? "bg-blue-100" : ""
-          }`}
-        >
-          <h2>Lifetime 🔥</h2>
-          <p>Rs 999</p>
+          <h2 className="text-2xl font-bold mb-2 text-red-600">
+            Master 🔥
+          </h2>
+
+          <p className="text-gray-500 mb-4">
+            Pass your exam with confidence
+          </p>
+
+          <p className="text-3xl font-bold mb-4">Rs 1499</p>
+
+          <ul className="space-y-2 mb-6">
+            <li>✅ Everything in Official</li>
+            <li>✅ Master exam questions</li>
+            <li>✅ Trick & difficult questions</li>
+            <li>✅ Real exam simulation</li>
+          </ul>
+
+          {plan === "master" ? (
+            <button className="w-full bg-gray-300 py-2 rounded cursor-not-allowed">
+              Current Plan
+            </button>
+          ) : (
+            <button
+              className="w-full bg-red-600 text-white py-2 rounded"
+              onClick={() => alert("TODO: payment master")}
+            >
+              Upgrade to Master 🚀
+            </button>
+          )}
+
         </div>
 
       </div>
 
-      {/* PAIEMENT INFO */}
-      <div className="bg-gray-100 p-4 mb-6 rounded">
-        <p className="mb-2">Pay via Juice:</p>
-        <strong className="text-lg">5771 8436</strong>
+      {/* FOOTER CTA */}
+      <div className="text-center mt-10">
+        <p className="text-gray-500">
+          1000+ students already improving their driving skills
+        </p>
       </div>
-
-      {/* INPUT TX */}
-      <input
-        type="text"
-        placeholder="Enter Transaction ID"
-        value={transactionId}
-        onChange={(e)=>setTransactionId(e.target.value)}
-        className="w-full p-3 border rounded mb-4"
-      />
-
-      {/* BOUTON */}
-      <button
-        onClick={submitPayment}
-        disabled={submitting}
-        className="w-full bg-green-600 text-white p-3 rounded"
-      >
-        {submitting ? "Submitting..." : "Submit Payment"}
-      </button>
 
     </div>
-
   )
 }
