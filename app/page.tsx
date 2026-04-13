@@ -175,7 +175,7 @@ export default function LandingPage() {
         </h2>
 
         <Link
-          href="/signup"
+          href="/premium"
           className="bg-blue-900 text-white px-8 py-3 rounded-lg"
         >
           Start Now 🚀
