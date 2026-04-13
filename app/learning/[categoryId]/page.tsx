@@ -42,6 +42,7 @@ export default function LearningCategoryPage() {
           )
         `)
         .eq("category_id", categoryId)
+        .limit(10)
 
       if (error) {
         console.error(error)
