@@ -19,7 +19,7 @@ export default function LandingPage() {
 
         <div className="flex justify-center gap-4">
           <Link
-            href="/signup"
+            href="/learning"
             className="bg-blue-900 text-white px-6 py-3 rounded-lg"
           >
             Start Free
