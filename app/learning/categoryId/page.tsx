@@ -53,7 +53,7 @@ export default function LearningCategoryPage() {
       const formatted = data
         ?.map(q => {
           const t = q.question_translations.find(
-            (tr: any) => tr.language_code === language.toUpperCase()
+            (tr: any) => tr.language_code === language.toLowerCase()
           )
 
           if (!t) return null
