@@ -3,12 +3,6 @@
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import Link from "next/link"
-import { useLanguage } from "../contexts/LanguageContext"
-
-type Category = {
-  id: string
-  name: string
-}
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,8 +11,7 @@ const supabase = createBrowserClient(
 
 export default function LearningPage() {
 
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<any[]>([])
 
   useEffect(() => {
 
