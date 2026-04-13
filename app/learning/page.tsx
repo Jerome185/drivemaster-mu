@@ -31,7 +31,7 @@ export default function LearningPage() {
 
       setLoading(true)
 
-      const lang = language.toLowerCase() // 🔥 FIX ICI
+      const lang = language.toUpperCase() // 🔥 FIX ICI
 
       const { data, error } = await supabase
         .from("questions")
