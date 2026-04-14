@@ -27,7 +27,7 @@ export default function LearningCategoryPage() {
 
       try {
 
-        const lang = language.toLowerCase()
+        const lang = language.toUpperCase()
 
         const { data, error } = await supabase
           .from("questions")
