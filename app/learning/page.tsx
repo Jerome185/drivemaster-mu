@@ -89,7 +89,7 @@ export default function LearningPage() {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => router.push(`/learning/${cat.id}`)} // 🔥 FIX ROUTE
+            onClick={() => router.push(`/learning/${cat.name}`)} // 🔥 FIX ROUTE
             className="border p-4 rounded-lg hover:bg-gray-100 transition"
           >
             {cat.name}
