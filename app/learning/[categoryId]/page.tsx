@@ -34,6 +34,7 @@ export default function LearningCategoryPage() {
           .select(`
             id,
             category_id,
+            sign:sign_id (image_url),
             question_translations!inner (
               question_text,
               option_a,
