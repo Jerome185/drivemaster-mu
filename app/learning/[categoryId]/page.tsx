@@ -25,39 +25,40 @@ export default function LearningCategoryPage() {
 
     const loadQuestions = async () => {
 
-      const { data, error } = await supabase
-        .from("questions")
-        .select(`
-          id,
-          category_id,
-          question_translations (
-            question_text,
-            option_a,
-            option_b,
-            option_c,
-            option_d,
-            correct_option,
-            explanation,
-            language_code
-          )
-        `)
-        .eq("category_id", categoryId)
-        .limit(10)
+      try {
 
-      if (error) {
-        console.error(error)
-        setLoading(false)
-        return
-      }
+        const lang = language.toUpperCase()
 
-      // 🔥 FILTER PAR LANGUE + FORMAT EXAM
-      const formatted = data
-        ?.map(q => {
-          const t = q.question_translations.find(
-            (tr: any) => tr.language_code === language.toUpperCase()
-          )
+        const { data, error } = await supabase
+          .from("questions")
+          .select(`
+            id,
+            category_id,
+            question_translations!inner (
+              question_text,
+              option_a,
+              option_b,
+              option_c,
+              option_d,
+              correct_option,
+              explanation,
+              language_code
+            )
+          `)
+          .eq("category_id", categoryId)
+          .eq("question_translations.language_code", lang) // 🔥 filtre AVANT limit
+          .eq("is_active", true)
+          .limit(10)
 
-          if (!t) return null
+        if (error) {
+          console.error("Error loading questions:", error)
+          setLoading(false)
+          return
+        }
+
+        // 🔥 FORMAT CLEAN POUR EXAM
+        const formatted = data?.map((q: any) => {
+          const t = q.question_translations[0]
 
           return {
             id: q.id,
@@ -71,11 +72,15 @@ export default function LearningCategoryPage() {
             weight: 1,
             difficulty_level: "minor"
           }
-        })
-        .filter(Boolean)
+        }) || []
 
-      setQuestions(formatted || [])
-      setLoading(false)
+        setQuestions(formatted)
+        setLoading(false)
+
+      } catch (err) {
+        console.error("Unexpected error:", err)
+        setLoading(false)
+      }
     }
 
     loadQuestions()
@@ -101,8 +106,12 @@ export default function LearningCategoryPage() {
     <div className="max-w-4xl mx-auto p-8">
 
       <h1 className="text-2xl font-bold mb-6">
-        Learning Mode 📚
+        {language === "fr" ? "Mode Apprentissage 📚" : "Learning Mode 📚"}
       </h1>
+
+      <p className="text-gray-500 mb-4 text-center">
+        {questions.length} {language === "fr" ? "questions affichées" : "questions shown"}
+      </p>
 
       <div className="flex justify-center">
         <Exam questions={questions} />
