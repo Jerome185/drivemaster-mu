@@ -27,14 +27,17 @@ export default function LearningCategoryPage() {
 
       try {
 
-        const lang = language.toUpperCase()
+        const lang = language.toLowerCase()
 
         const { data, error } = await supabase
           .from("questions")
           .select(`
             id,
             category_id,
-            sign:sign_id (image_url),
+            sign_id,
+            signs (
+              image_url
+            ),
             question_translations!inner (
               question_text,
               option_a,
@@ -57,7 +60,7 @@ export default function LearningCategoryPage() {
           return
         }
 
-        // 🔥 FORMAT CLEAN POUR EXAM
+        // 🔥 FORMAT POUR EXAM
         const formatted = data?.map((q: any) => {
           const t = q.question_translations[0]
 
@@ -70,6 +73,7 @@ export default function LearningCategoryPage() {
             option_d: t.option_d,
             correct_option: t.correct_option,
             explanation: t.explanation,
+            image_url: q.signs?.image_url || null, // 🔥 IMAGE
             weight: 1,
             difficulty_level: "minor"
           }
@@ -111,7 +115,8 @@ export default function LearningCategoryPage() {
       </h1>
 
       <p className="text-gray-500 mb-4 text-center">
-        {questions.length} {language === "fr" ? "questions affichées" : "questions shown"}
+        {questions.length}{" "}
+        {language === "fr" ? "questions affichées" : "questions shown"}
       </p>
 
       <div className="flex justify-center">
