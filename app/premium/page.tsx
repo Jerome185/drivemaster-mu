@@ -81,7 +81,7 @@ export default function PremiumPage() {
           ) : (
             <button
               className="w-full bg-blue-900 text-white py-2 rounded"
-              onClick={() => alert("TODO: payment official")}
+              onClick={() => alert("TODO: JUICE payment Official on 5771 8436")}
             >
               Upgrade to Official
             </button>
@@ -118,7 +118,7 @@ export default function PremiumPage() {
           ) : (
             <button
               className="w-full bg-red-600 text-white py-2 rounded"
-              onClick={() => alert("TODO: payment master")}
+              onClick={() => alert("TODO: JUICE payment Master on 5771 8436")}
             >
               Upgrade to Master 🚀
             </button>
