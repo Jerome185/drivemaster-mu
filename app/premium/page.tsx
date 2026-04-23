@@ -69,6 +69,7 @@ export default function PremiumPage() {
           user_id: session.user.id,
           transaction_id: transactionId,
           plan: selectedPlan,
+          amount: selectedPlan === "official" ? 999 : 1499,
           status: "pending"
         })
 
