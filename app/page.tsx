@@ -1,188 +1,111 @@
 "use client"
 
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-export default function LandingPage() {
+export default function Home() {
+  const router = useRouter()
+
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen bg-white text-gray-900">
 
-      {/* ================= HERO ================= */}
-      <section className="text-center px-6 py-16">
-
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Pass your driving test faster 🚗
+      {/* HERO */}
+      <section className="px-6 py-12 text-center max-w-4xl mx-auto">
+        <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+          Réussis ton permis à Maurice du premier coup 🚗
         </h1>
 
-        <p className="text-lg text-gray-600 mb-6">
-          Practice real exam questions. Learn faster. Pass with confidence.
+        <p className="mt-4 text-lg text-gray-600">
+          Entraîne-toi avec des questions type examen + explications claires
         </p>
 
-        <div className="flex justify-center gap-4">
-          <Link
-            href="/learning"
-            className="bg-blue-900 text-white px-6 py-3 rounded-lg"
-          >
-            Start Free
-          </Link>
-
-          <Link
-            href="/premium"
-            className="border px-6 py-3 rounded-lg"
-          >
-            View Plans
-          </Link>
+        <div className="mt-6 space-y-2 text-sm text-gray-500">
+          <p>✅ Français & Anglais</p>
+          <p>✅ Questions réalistes</p>
+          <p>✅ Mobile friendly</p>
         </div>
 
-      </section>
-
-      {/* ================= BENEFITS ================= */}
-      <section className="bg-gray-50 py-12 px-6">
-
-        <h2 className="text-2xl font-bold text-center mb-10">
-          Why DriveMaster?
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-6 text-center">
-
-          <div>
-            <h3 className="font-semibold text-lg">🎯 Real exam questions</h3>
-            <p className="text-gray-600 mt-2">
-              Practice questions similar to the real driving test.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-lg">⚡ Learn faster</h3>
-            <p className="text-gray-600 mt-2">
-              Improve with explanations and smart repetition.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-lg">📱 Practice anywhere</h3>
-            <p className="text-gray-600 mt-2">
-              Mobile-friendly and easy to use anytime.
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= HOW IT WORKS ================= */}
-      <section className="py-12 px-6 text-center">
-
-        <h2 className="text-2xl font-bold mb-10">
-          How it works
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-6">
-
-          <div>
-            <h3 className="font-semibold">1. Practice</h3>
-            <p className="text-gray-600 mt-2">
-              Answer real driving test questions
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold">2. Learn</h3>
-            <p className="text-gray-600 mt-2">
-              Understand mistakes with explanations
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold">3. Pass</h3>
-            <p className="text-gray-600 mt-2">
-              Be fully prepared for your exam
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= PRICING ================= */}
-      <section className="bg-gray-50 py-12 px-6">
-
-        <h2 className="text-2xl font-bold text-center mb-10">
-          Choose your plan
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-
-          {/* OFFICIAL */}
-          <div className="border rounded-xl p-6 text-center">
-
-            <h3 className="text-xl font-bold mb-2">Official</h3>
-            <p className="text-gray-500 mb-4">Start your journey</p>
-
-            <p className="text-3xl font-bold mb-4">Rs 999</p>
-
-            <ul className="space-y-2 mb-6">
-              <li>✅ Unlimited questions</li>
-              <li>✅ Practice anytime</li>
-              <li>❌ Master mode</li>
-            </ul>
-
-            <Link
-              href="/premium"
-              className="bg-blue-900 text-white px-6 py-2 rounded"
-            >
-              Get Started
-            </Link>
-
-          </div>
-
-          {/* MASTER */}
-          <div className="border-2 border-red-600 rounded-xl p-6 text-center">
-
-            <h3 className="text-xl font-bold text-red-600 mb-2">
-              Master 🔥
-            </h3>
-
-            <p className="text-gray-500 mb-4">
-              Pass with confidence
-            </p>
-
-            <p className="text-3xl font-bold mb-4">Rs 1499</p>
-
-            <ul className="space-y-2 mb-6">
-              <li>✅ Everything in Official</li>
-              <li>✅ Hard questions</li>
-              <li>✅ Exam simulation</li>
-            </ul>
-
-            <Link
-              href="/premium"
-              className="bg-red-600 text-white px-6 py-2 rounded"
-            >
-              Go Master 🚀
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= FINAL CTA ================= */}
-      <section className="text-center py-16">
-
-        <h2 className="text-3xl font-bold mb-4">
-          Ready to pass your test?
-        </h2>
-
-        <Link
-          href="/premium"
-          className="bg-blue-900 text-white px-8 py-3 rounded-lg"
+        <button
+          onClick={() => router.push("/exam")}
+          className="mt-8 bg-black text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-gray-800 transition"
         >
-          Start Now 🚀
-        </Link>
+          Commencer maintenant
+        </button>
 
+        <p className="mt-3 text-sm text-red-500 font-medium">
+          🔥 Offre lancement : Rs 999 (places limitées)
+        </p>
       </section>
 
-    </div>
+      {/* PROBLEM */}
+      <section className="bg-gray-50 py-12 px-6 text-center">
+        <h2 className="text-2xl font-semibold">
+          Pourquoi beaucoup échouent ?
+        </h2>
+
+        <div className="mt-6 space-y-3 text-gray-600">
+          <p>❌ Questions piégeuses</p>
+          <p>❌ Réponses ambiguës</p>
+          <p>❌ Pas assez d’entraînement réel</p>
+        </div>
+
+        <p className="mt-6 font-medium text-gray-800">
+          👉 Ce n’est pas un problème de conduite.
+        </p>
+      </section>
+
+      {/* SOLUTION */}
+      <section className="py-12 px-6 text-center max-w-4xl mx-auto">
+        <h2 className="text-2xl font-semibold">
+          La solution : DriveMaster MU
+        </h2>
+
+        <div className="mt-6 grid md:grid-cols-3 gap-6 text-sm">
+          <div className="p-4 border rounded-xl">
+            <p className="font-semibold">🎯 Questions type examen</p>
+            <p className="text-gray-500 mt-2">
+              Inspirées des vrais tests
+            </p>
+          </div>
+
+          <div className="p-4 border rounded-xl">
+            <p className="font-semibold">🧠 Explications simples</p>
+            <p className="text-gray-500 mt-2">
+              Comprends tes erreurs
+            </p>
+          </div>
+
+          <div className="p-4 border rounded-xl">
+            <p className="font-semibold">📱 Mobile friendly</p>
+            <p className="text-gray-500 mt-2">
+              Révise partout
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-12 text-center bg-black text-white">
+        <h2 className="text-2xl font-semibold">
+          Prêt à réussir ton permis ?
+        </h2>
+
+        <button
+          onClick={() => router.push("/exam")}
+          className="mt-6 bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+        >
+          Accéder aux examens
+        </button>
+
+        <p className="mt-4 text-sm text-gray-300">
+          Accès immédiat après inscription
+        </p>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-6 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} DriveMaster MU
+      </footer>
+
+    </main>
   )
 }
