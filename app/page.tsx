@@ -25,7 +25,7 @@ export default function Home() {
         </div>
 
         <button
-          onClick={() => router.push("/exam")}
+          onClick={() => router.push("/premium")}
           className="mt-8 bg-black text-white px-6 py-3 rounded-xl text-lg font-semibold hover:bg-gray-800 transition"
         >
           Commencer maintenant
@@ -90,7 +90,7 @@ export default function Home() {
         </h2>
 
         <button
-          onClick={() => router.push("/exam")}
+          onClick={() => router.push("/premium")}
           className="mt-6 bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
         >
           Accéder aux examens
