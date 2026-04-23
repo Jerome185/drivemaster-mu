@@ -48,6 +48,7 @@ export default function AdminPage(){
  const { data, error } = await supabase
   .from("payments")
   .select("*")
+  .eq("status", "pending")
   .order("created_at", { ascending: false })
 
   console.log("DATA:", data)
