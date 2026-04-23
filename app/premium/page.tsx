@@ -137,7 +137,10 @@ export default function PremiumPage() {
           ) : (
             <button
               className="w-full bg-blue-900 text-white py-2 rounded"
-              onClick={() => alert("VERSION OK")}
+              onClick={() => {
+                setSelectedPlan("official")
+                setShowPayment(true)
+              }}
               
             >
               Upgrade to Official
