@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,7 +9,6 @@ const supabase = createBrowserClient(
 )
 
 export default function PremiumPage() {
-  const router = useRouter()
 
   const [plan, setPlan] = useState<"free" | "official" | "master" | null>(null)
   const [loading, setLoading] = useState(true)
@@ -83,7 +81,7 @@ export default function PremiumPage() {
           ) : (
             <button
               className="w-full bg-blue-900 text-white py-2 rounded"
-              onClick={() => router.push("/subscription")}
+              onClick={() => alert("TODO: JUICE payment on 5771 8436 for Official")}
               
             >
               Upgrade to Official
