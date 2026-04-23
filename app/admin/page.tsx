@@ -56,7 +56,7 @@ export default function AdminPage(){
           email
     )
   `)
-  .eq("status","pending")
+  .in("status", ["pending", "approved"])
   .order("created_at",{ ascending:false })
 
   console.log("DATA:", data)
