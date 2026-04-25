@@ -2,6 +2,11 @@
 
 import { createBrowserClient } from "@supabase/ssr"
 import { useState, useEffect } from "react"
+import { useLanguage } from "@/app/contexts/LanguageContext"
+import { translations } from "@/lib/translations"
+
+const { language } = useLanguage()
+const t = translations[language]
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -200,7 +205,7 @@ const correct = [...correctOptions]
           onClick={() => window.location.reload()}
           className="mt-4 bg-blue-900 text-white px-4 py-2 rounded"
         >
-          Retry
+          {t.retry}
         </button>
       </div>
     )
@@ -303,7 +308,7 @@ const correct = [...correctOptions]
             onClick={handleNext}
             className="mt-4 w-full bg-blue-900 text-white py-2 rounded"
           >
-            Next
+            {t.next}
           </button>
         </div>
       )}

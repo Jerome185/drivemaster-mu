@@ -1,6 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useLanguage } from "@/app/contexts/LanguageContext"
+import { translations } from "@/lib/translations"
+
+const { language } = useLanguage()
+const t = translations[language]
 
 type Question = {
   question_text: string

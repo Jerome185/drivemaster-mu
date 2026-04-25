@@ -72,7 +72,9 @@ export const translations = {
     dashboard: "Dashboard",
     admin: "Admin",
     login: "Connexion",
-    logout: "Déconnexion"
+    logout: "Déconnexion",
+    next: "Suivant",
+    retry: "Réessayer"
   },
 
   en: {
@@ -148,7 +150,9 @@ export const translations = {
      dashboard: "Dashboard",
      admin: "Admin",
      login: "Login",
-     logout: "Logout"
+     logout: "Logout",
+     next: "Suivant",
+     retry: "Réessayer"
 
   }
 }
