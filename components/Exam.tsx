@@ -5,8 +5,6 @@ import { useState, useEffect } from "react"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { translations } from "@/lib/translations"
 
-const { language } = useLanguage()
-const t = translations[language]
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,6 +32,9 @@ export default function Exam({
   questions: Question[]
   isMaster?: boolean
 }) {
+   // 🌍 LANGUE (FIX ICI)
+  const { language } = useLanguage()
+  const t = translations[language] || translations["en"]
 
   // 🔐 USER
   const [isPremium, setIsPremium] = useState(false)

@@ -1,6 +1,6 @@
 import "./globals.css"
 import Header from "@/components/Header"
-import { LanguageProvider } from "@/app/contexts/LanguageContext"
+import Providers from "./providers"
 
 export default function RootLayout({
   children,
@@ -11,17 +11,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
 
-        <LanguageProvider>
-
-          {/* HEADER CORRECT */}
+        <Providers>
           <Header />
 
-          {/* CONTENU AVEC OFFSET */}
           <main className="pt-20">
             {children}
           </main>
-
-        </LanguageProvider>
+        </Providers>
 
       </body>
     </html>

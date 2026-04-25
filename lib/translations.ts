@@ -74,7 +74,8 @@ export const translations = {
     login: "Connexion",
     logout: "Déconnexion",
     next: "Suivant",
-    retry: "Réessayer"
+    retry: "Réessayer",
+    examFinished: "Examen Complété"
   },
 
   en: {
@@ -152,7 +153,8 @@ export const translations = {
      login: "Login",
      logout: "Logout",
      next: "Suivant",
-     retry: "Réessayer"
+     retry: "Réessayer",
+     examFinished: "Examen Complété"
 
   }
 }
