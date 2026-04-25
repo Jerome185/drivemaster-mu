@@ -1,7 +1,7 @@
 "use client"
 
 import { createBrowserClient } from "@supabase/ssr"
-import { useState, useEffect } from "react"
+import { useState, useEffect , useMemo } from "react"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { translations } from "@/lib/translations"
 
@@ -32,6 +32,8 @@ export default function Exam({
   questions: Question[]
   isMaster?: boolean
 }) {
+
+
    // 🌍 LANGUE (FIX ICI)
   const { language } = useLanguage()
   const t = translations[language] || translations["en"]
@@ -52,12 +54,28 @@ export default function Exam({
   const [timeLeft, setTimeLeft] = useState(timePerQuestion)
 
   const currentQuestion = questions?.[currentIndex]
+  
 
   // 🧠 MULTI
   const correctOptions = currentQuestion.correct_option
   .split(",")
   .map(opt => opt.trim().toUpperCase()) || []
   const isMultiple = correctOptions.length > 1
+
+  // 🔀 SHUFFLE DES RÉPONSES (PROPRE)
+  const shuffledAnswers = useMemo(() => {
+    if (!currentQuestion) return []
+
+    const answers = [
+      { key: "A", text: currentQuestion.option_a },
+      { key: "B", text: currentQuestion.option_b },
+      { key: "C", text: currentQuestion.option_c },
+      { key: "D", text: currentQuestion.option_d },
+    ]
+
+    return [...answers].sort(() => Math.random() - 0.5)
+  }, [currentQuestion])
+
 
   // 🔐 PROFILE
   useEffect(() => {
