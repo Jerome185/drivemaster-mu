@@ -4,11 +4,14 @@ import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useLanguage } from "../app/contexts/LanguageContext"
+import { useLanguage } from "@/app/contexts/LanguageContext"
+import { translations } from "@/lib/translations"
 
 export default function Header() {
+
   const router = useRouter()
   const { language, setLanguage } = useLanguage()
+  const t = translations[language]
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +21,6 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // 🔥 ADMIN EMAIL (remplace par le tien)
   const isAdmin = user?.email === "jerome.moorghen@gmail.com"
 
   useEffect(() => {
@@ -50,24 +52,22 @@ export default function Header() {
       {/* TOP BAR */}
       <div className="flex justify-between items-center px-4 py-3">
 
-        {/* LOGO */}
         <Link href="/" className="font-bold text-lg text-blue-700">
           DriveMaster MU 🚗
         </Link>
 
-        {/* DESKTOP NAV */}
+        {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
 
-          <Link href="/learning">Learning</Link>
-          <Link href="/official">Official</Link>
-          <Link href="/master">Master</Link>
+          <Link href="/learning">{t.learning}</Link>
+          <Link href="/official">{t.official}</Link>
+          <Link href="/master">{t.master}</Link>
 
-          {user && <Link href="/dashboard">Dashboard</Link>}
+          {user && <Link href="/dashboard">{t.dashboard}</Link>}
 
-          {/* 🔥 ADMIN */}
           {isAdmin && (
             <Link href="/admin" className="text-purple-600 font-semibold">
-              Admin
+              {t.admin}
             </Link>
           )}
 
@@ -87,19 +87,19 @@ export default function Header() {
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-1 rounded"
             >
-              {language === "fr" ? "Déconnexion" : "Logout"}
+              {t.logout}
             </button>
           ) : (
             <Link
               href="/login"
               className="bg-blue-600 text-white px-3 py-1 rounded"
             >
-              {language === "fr" ? "Connexion" : "Login"}
+              {t.login}
             </Link>
           )}
         </div>
 
-        {/* BURGER BUTTON */}
+        {/* MOBILE BUTTON */}
         <button
           className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -113,31 +113,29 @@ export default function Header() {
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t">
 
           <Link href="/learning" onClick={() => setMenuOpen(false)}>
-            Learning
+            {t.learning}
           </Link>
 
           <Link href="/official" onClick={() => setMenuOpen(false)}>
-            Official
+            {t.official}
           </Link>
 
           <Link href="/master" onClick={() => setMenuOpen(false)}>
-            Master
+            {t.master}
           </Link>
 
           {user && (
             <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
-              Dashboard
+              {t.dashboard}
             </Link>
           )}
 
-          {/* 🔥 ADMIN MOBILE */}
           {isAdmin && (
             <Link href="/admin" onClick={() => setMenuOpen(false)}>
-              Admin
+              {t.admin}
             </Link>
           )}
 
-          {/* LANGUAGE */}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
@@ -147,13 +145,12 @@ export default function Header() {
             <option value="fr">FR</option>
           </select>
 
-          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-2 rounded"
             >
-              {language === "fr" ? "Déconnexion" : "Logout"}
+              {t.logout}
             </button>
           ) : (
             <Link
@@ -161,7 +158,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               className="bg-blue-600 text-white px-3 py-2 rounded"
             >
-              {language === "fr" ? "Connexion" : "Login"}
+              {t.login}
             </Link>
           )}
         </div>
