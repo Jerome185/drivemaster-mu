@@ -199,8 +199,13 @@ const correct = [...correctOptions]
   if (examFinished) {
     return (
       <div className="p-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Exam finished</h2>
+        <h2 className="text-3xl font-bold mb-4">{t.examfinished}</h2>
         <p>Score: {score}</p>
+
+       {/* 🔥 AJOUT ICI */}
+        <p className="mt-2 text-sm text-gray-500">
+          {score >= 8 ? t.success : t.fail}
+        </p>
 
         <button
           onClick={() => window.location.reload()}

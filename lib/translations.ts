@@ -75,7 +75,10 @@ export const translations = {
     logout: "Déconnexion",
     next: "Suivant",
     retry: "Réessayer",
-    examFinished: "Examen Complété"
+    examfinished: "Examen terminé",
+    score: "Score",
+    success: "Bien joué !",
+    fail: "Continue à t'entraîner !"
   },
 
   en: {
@@ -154,7 +157,10 @@ export const translations = {
      logout: "Logout",
      next: "Suivant",
      retry: "Réessayer",
-     examFinished: "Examen Complété"
+     examfinished: "Exam finished",
+     score: "Score",
+     success: "Well done!",
+     fail: "Keep practicing!"
+}
 
   }
-}
