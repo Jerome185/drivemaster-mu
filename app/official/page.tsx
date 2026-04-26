@@ -163,7 +163,8 @@ export default function OfficialPage(){
         <Exam
           questions={questions}
           isMaster={false}
-        />
+          onRetry={() => window.location.reload()}
+/>
       </div>
 
     </div>

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
@@ -7,6 +7,7 @@ import { useLanguage } from "../contexts/LanguageContext"
 
 type Category = {
   id: string
+  code: string
   name: string
 }
 
@@ -31,32 +32,28 @@ export default function LearningPage() {
 
       setLoading(true)
 
-      const lang = language.toUpperCase() // 🔥 FIX ICI
+      const lang = language.toUpperCase()
 
       const { data, error } = await supabase
-        .from("questions")
+        .from("categories")
         .select(`
-          categories (id, name),
-          question_translations!inner (language_code)
+          id,
+          code,
+          category_translations!inner(name, language_code)
         `)
-        .eq("question_translations.language_code", lang)
-        .eq("is_active", true)
+        .eq("category_translations.language_code", lang)
 
       if (error) {
         console.error("Error fetching categories:", error)
       } else {
 
-        const uniqueMap = new Map<string, Category>()
+        const formatted = data.map((cat: any) => ({
+          id: cat.id,
+          code: cat.code,
+          name: cat.category_translations[0]?.name
+        }))
 
-        data?.forEach((item: any) => {
-          const cat = item.categories
-
-          if (cat && !uniqueMap.has(cat.id)) {
-            uniqueMap.set(cat.id, cat)
-          }
-        })
-
-        setCategories(Array.from(uniqueMap.values()))
+        setCategories(formatted)
       }
 
       setLoading(false)
@@ -89,7 +86,7 @@ export default function LearningPage() {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => router.push(`/learning/${cat.id}`)} // 🔥 FIX ROUTE
+            onClick={() => router.push(`/learning/${cat.code}?lang=${language.toUpperCase()}`)} // ✅ FIX FINAL
             className="border p-4 rounded-lg hover:bg-gray-100 transition"
           >
             {cat.name}

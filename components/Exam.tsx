@@ -4,35 +4,25 @@ import { createBrowserClient } from "@supabase/ssr"
 import { useState, useEffect , useMemo } from "react"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { translations } from "@/lib/translations"
-
+import { Question } from "@/types/question"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-type Question = {
-  id: string
-  question_text: string
-  option_a: string
-  option_b: string
-  option_c: string
-  option_d: string
-  correct_option: string // "A" ou "A,C"
-  explanation: string
-  weight: number
-  difficulty_level: string
-  image_url?: string
+
+type ExamProps = {
+  questions: Question[]
+  onRetry?: () => void
+  isMaster?: boolean
 }
 
 export default function Exam({
   questions,
+  onRetry,
   isMaster = false
-}: {
-  questions: Question[]
-  isMaster?: boolean
-}) {
-
+}: ExamProps) {
 
    // 🌍 LANGUE (FIX ICI)
   const { language } = useLanguage()
@@ -57,9 +47,13 @@ export default function Exam({
   
 
   // 🧠 MULTI
-  const correctOptions = currentQuestion.correct_option
-  .split(",")
-  .map(opt => opt.trim().toUpperCase()) || []
+  const correctOptions = useMemo(() => {
+  if (!currentQuestion?.correct_option) return []
+
+  return currentQuestion.correct_option
+    .split(",")
+    .map((opt) => opt.trim().toUpperCase())
+}, [currentQuestion])
   const isMultiple = correctOptions.length > 1
 
   // 🔀 SHUFFLE DES RÉPONSES (PROPRE)

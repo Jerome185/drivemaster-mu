@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import Exam from "@/components/Exam"
+import Exam from '../../components/Exam'
 import { useLanguage } from "@/app/contexts/LanguageContext"
 
 const supabase = createBrowserClient(
@@ -28,7 +28,7 @@ export default function MasterPage() {
 
         const { data, error } = await supabase.rpc(
           "get_master_exam_questions",
-          { lang: language.toLowerCase() }
+          { lang: language.toUpperCase() }
         )
 
         if (error) {
@@ -80,7 +80,11 @@ export default function MasterPage() {
       </h1>
 
       <div className="flex justify-center">
-        <Exam questions={questions} isMaster={true} />
+        <Exam 
+          questions={questions} 
+          isMaster={true} 
+          onRetry={() => window.location.reload()} 
+/>
       </div>
 
     </div>
