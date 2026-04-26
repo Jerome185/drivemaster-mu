@@ -49,13 +49,16 @@ export default function LearningCategoryPage({
         category_code: code,
       }
     )
+    console.log('QUESTIONS LENGTH:', questions.length)
 
     if (error) {
       console.error('RPC ERROR:', error)
       setError('Erreur chargement questions')
     } else {
-      setQuestions(data || [])
+      setQuestions((data || []).slice(0, 10))
     }
+    
+    console.log('STATE QUESTIONS LENGTH:', (data || []).length)
 
     setLoading(false)
   }
