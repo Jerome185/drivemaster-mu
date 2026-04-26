@@ -16,6 +16,7 @@ type Question = {
   option_d: string
   correct_option: string
   explanation: string
+  weight?: number
 }
 
 export default function LearningCategoryPage({
