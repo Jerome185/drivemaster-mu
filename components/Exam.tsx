@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Question = {
   id: string
@@ -16,33 +16,58 @@ type Question = {
 
 type ExamProps = {
   questions: Question[]
-  isMaster?: boolean
+  mode?: 'learning' | 'exam'
   onRetry?: () => void
 }
 
-export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
+export default function Exam({ questions, mode = 'learning', onRetry }: ExamProps) {
 
-  // 🔥 SAFE: max 10 questions + no duplicates
+  const isExam = mode === 'exam'
+
+  // 🔥 SAFE QUESTIONS
   const safeQuestions = Array.from(
     new Map(questions.map(q => [q.id, q])).values()
-  ).slice(0, 10)
+  ).slice(0, isExam ? 35 : 10)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
 
+  // ⏱ TIMER (exam uniquement)
+  const [timeLeft, setTimeLeft] = useState(1800)
+
   const currentQuestion = safeQuestions[currentIndex]
+
+  useEffect(() => {
+    if (!isExam || showResult) return
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          setShowResult(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [isExam, showResult])
+
+  const formatTime = (sec: number) => {
+    const min = Math.floor(sec / 60)
+    const s = sec % 60
+    return `${min}:${s.toString().padStart(2, '0')}`
+  }
 
   const handleAnswer = (option: string) => {
     if (selected) return
 
     setSelected(option)
 
-    const isCorrect = option === currentQuestion.correct_option
-
-    // ✅ 1 point seulement
-    if (isCorrect) {
+    if (option === currentQuestion.correct_option) {
       setScore(prev => prev + 1)
     }
   }
@@ -58,13 +83,21 @@ export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
 
   // 🎯 RESULT
   if (showResult) {
+
     const total = safeQuestions.length
     const percentage = Math.round((score / total) * 100)
 
+    const passed = isExam ? score >= 30 : true
+
     return (
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">
-          {isMaster ? 'Master Result 🔥' : 'Résultat'}
+
+        <h2 className="text-3xl font-bold mb-4">
+          {isExam
+            ? passed
+              ? '✅ PASSED'
+              : '❌ FAILED'
+            : 'Résultat'}
         </h2>
 
         <p className="text-lg mb-2">
@@ -75,12 +108,21 @@ export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
           {percentage}%
         </p>
 
+        {isExam && (
+          <p className="mb-6">
+            {passed
+              ? 'Congratulations! You passed the exam.'
+              : 'You did not reach the passing score (30).'}
+          </p>
+        )}
+
         <button
           onClick={() => onRetry?.()}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-6 py-3 rounded"
         >
           Recommencer
         </button>
+
       </div>
     )
   }
@@ -88,17 +130,25 @@ export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
   return (
     <div className="bg-white shadow p-6 rounded-lg max-w-2xl mx-auto">
 
-      {/* Progress */}
-      <p className="text-sm text-gray-500 mb-2">
-        Question {currentIndex + 1} / {safeQuestions.length}
-      </p>
+      {/* HEADER */}
+      <div className="flex justify-between mb-4 text-sm font-semibold">
+        <span>
+          Question {currentIndex + 1} / {safeQuestions.length}
+        </span>
 
-      {/* Question */}
+        {isExam && (
+          <span className="text-red-600">
+            ⏱ {formatTime(timeLeft)}
+          </span>
+        )}
+      </div>
+
+      {/* QUESTION */}
       <h2 className="text-lg font-semibold mb-4">
         {currentQuestion.question_text}
       </h2>
 
-      {/* Image */}
+      {/* IMAGE */}
       {currentQuestion.image_url && (
         <img
           src={currentQuestion.image_url}
@@ -107,7 +157,7 @@ export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
         />
       )}
 
-      {/* Options */}
+      {/* OPTIONS */}
       <div className="grid gap-3">
         {(['A', 'B', 'C', 'D'] as const).map((key) => {
 
@@ -139,20 +189,20 @@ export default function Exam({ questions, isMaster, onRetry }: ExamProps) {
         })}
       </div>
 
-      {/* Explanation */}
-      {selected && (
+      {/* EXPLANATION (learning seulement) */}
+      {!isExam && selected && (
         <div className="mt-4 text-sm text-gray-700">
           <strong>Explication:</strong> {currentQuestion.explanation}
         </div>
       )}
 
-      {/* Next */}
+      {/* NEXT */}
       {selected && (
         <button
           onClick={handleNext}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded w-full"
         >
-          Suivant
+          {isExam ? 'Next' : 'Suivant'}
         </button>
       )}
 
