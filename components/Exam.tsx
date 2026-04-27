@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 
 type Question = {
   id: string
@@ -20,6 +21,11 @@ type ExamProps = {
   onRetry?: () => void
 }
 
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 export default function Exam({ questions, mode = 'learning', onRetry }: ExamProps) {
 
   const isExam = mode === 'exam'
@@ -34,11 +40,12 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
   const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
 
-  // ⏱ TIMER (exam uniquement)
   const [timeLeft, setTimeLeft] = useState(1800)
+  const [saved, setSaved] = useState(false)
 
   const currentQuestion = safeQuestions[currentIndex]
 
+  // ⏱ TIMER
   useEffect(() => {
     if (!isExam || showResult) return
 
@@ -81,12 +88,37 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
     }
   }
 
+  // 💾 SAVE ATTEMPT
+  const saveAttempt = async (score: number, total: number) => {
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData.user) return
+
+    const percentage = Math.round((score / total) * 100)
+    const passed = score >= 30
+
+    await supabase.from('exam_attempts').insert({
+      user_id: userData.user.id,
+      exam_level: 'official',
+      score: score,
+      total_score: total,
+      percentage: percentage,
+      passed: passed
+    })
+  }
+
+  // 🔒 SAVE ONCE
+  useEffect(() => {
+    if (showResult && isExam && !saved) {
+      saveAttempt(score, safeQuestions.length)
+      setSaved(true)
+    }
+  }, [showResult])
+
   // 🎯 RESULT
   if (showResult) {
 
     const total = safeQuestions.length
     const percentage = Math.round((score / total) * 100)
-
     const passed = isExam ? score >= 30 : true
 
     return (
@@ -189,7 +221,7 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
         })}
       </div>
 
-      {/* EXPLANATION (learning seulement) */}
+      {/* EXPLANATION */}
       {!isExam && selected && (
         <div className="mt-4 text-sm text-gray-700">
           <strong>Explication:</strong> {currentQuestion.explanation}
