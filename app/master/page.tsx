@@ -82,7 +82,7 @@ export default function MasterPage() {
       <div className="flex justify-center">
         <Exam 
           questions={questions} 
-          isMaster={true} 
+          mode="exam" 
           onRetry={() => window.location.reload()} 
 />
       </div>

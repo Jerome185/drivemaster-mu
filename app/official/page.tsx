@@ -162,7 +162,7 @@ export default function OfficialPage(){
       <div className="flex justify-center">
         <Exam
           questions={questions}
-          isMaster={false}
+          mode="exam"
           onRetry={() => window.location.reload()}
 />
       </div>
