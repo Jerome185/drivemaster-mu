@@ -88,12 +88,14 @@ export default function LearningCategoryPage({
 
   // ⚠️ No questions
   if (!questions.length) {
-    return (
-      <div className="p-6 text-center">
-        Aucune question disponible
-      </div>
-    )
-  }
+  return (
+    <div className="p-10 text-center">
+      {lang === "FR"
+        ? "Aucune question disponible"
+        : "No questions available"}
+    </div>
+  )
+}
 
   // 🎯 Main
   return (

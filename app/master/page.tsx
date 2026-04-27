@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import Exam from '../../components/Exam'
+import Exam from "../../components/Exam"
 import { useLanguage } from "@/app/contexts/LanguageContext"
+import Link from "next/link"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,78 +15,124 @@ export default function MasterPage() {
 
   const { language } = useLanguage()
 
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [questions, setQuestions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
 
-    if (!language) return
+    const loadData = async () => {
 
-    const loadQuestions = async () => {
+      const { data:userData } = await supabase.auth.getUser()
 
-      try {
+      if(!userData.user){
+        setLoading(false)
+        return
+      }
 
-        const { data, error } = await supabase.rpc(
+      setUser(userData.user)
+
+      let { data:profileData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userData.user.id)
+        .maybeSingle()
+
+      setProfile(profileData)
+
+      const isMasterAccess =
+        profileData?.is_premium &&
+        profileData?.premium_expires_at &&
+        new Date(profileData.premium_expires_at) > new Date() &&
+        profileData?.plan === "master"
+
+      if(isMasterAccess){
+        const { data } = await supabase.rpc(
           "get_master_exam_questions",
           { lang: language.toUpperCase() }
         )
 
-        if (error) {
-          console.error(error)
-          setError("Failed to load questions")
-          setLoading(false)
-          return
-        }
-
         setQuestions(data || [])
-        setLoading(false)
-
-      } catch (err) {
-        console.error(err)
-        setError("Unexpected error")
-        setLoading(false)
       }
+
+      setLoading(false)
     }
 
-    loadQuestions()
+    loadData()
 
   }, [language])
 
-  // ⏳ LOADING
-  if (loading) {
-    return <div className="p-10 text-center">Loading...</div>
-  }
+  if(loading) return <div className="p-10 text-center">Loading...</div>
 
-  // ❌ ERROR
-  if (error) {
-    return <div className="p-10 text-center text-red-600">{error}</div>
-  }
-
-  // ⚠️ NO QUESTIONS
-  if (!questions.length) {
+  if(!user){
     return (
       <div className="p-10 text-center">
-        No questions available
+        <h1>Login Required 🔐</h1>
+        <Link href="/login">Login</Link>
       </div>
     )
   }
 
-  // 🎮 MAIN
-  return (
-    <div className="max-w-4xl mx-auto p-8">
+  const isExpired =
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) <= new Date()
 
-      <h1 className="text-3xl font-bold text-center mb-6 text-red-800">
+  const isMasterAccess =
+    profile?.is_premium &&
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) > new Date() &&
+    profile?.plan === "master"
+
+  // 🔥 USER OFFICIAL → PROPOSE UPGRADE
+  if(profile?.plan === "official"){
+    return (
+      <div className="p-10 text-center">
+
+        <h1 className="text-3xl mb-4">Master Mode 🔥</h1>
+
+        <p className="mb-6">
+          Upgrade to Master to unlock advanced exams
+        </p>
+
+        <Link href="/premium" className="bg-red-600 px-6 py-3 text-white rounded">
+          Upgrade to Master
+        </Link>
+      </div>
+    )
+  }
+
+  if(!isMasterAccess){
+    return (
+      <div className="p-10 text-center">
+
+        <h1 className="text-3xl mb-4">Master 🔒</h1>
+
+        {isExpired ? (
+          <p className="text-red-600 mb-6">Your access expired</p>
+        ) : (
+          <p className="mb-6">Upgrade to Master</p>
+        )}
+
+        <Link href="/premium" className="bg-red-600 px-6 py-3 text-white rounded">
+          Upgrade
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+
+      <h1 className="text-3xl text-center mb-4 text-red-700">
         Master Mode 🔥
       </h1>
 
-      <div className="flex justify-center">
-        <Exam 
-          questions={questions} 
-          mode="exam" 
-          onRetry={() => window.location.reload()} 
-/>
-      </div>
+      <Exam
+        questions={questions}
+        mode="exam"
+        onRetry={() => window.location.reload()}
+      />
 
     </div>
   )

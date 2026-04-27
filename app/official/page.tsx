@@ -24,151 +24,96 @@ export default function OfficialPage(){
 
     const loadData = async () => {
 
-      try {
+      const { data:userData } = await supabase.auth.getUser()
 
-        // 🔐 USER
-        const { data:userData } = await supabase.auth.getUser()
-
-        if(!userData.user){
-          setLoading(false)
-          return
-        }
-
-        setUser(userData.user)
-        
-
-        // 👤 PROFILE
-        let { data:profileData } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", userData.user.id)
-          .maybeSingle()
-
-        // 🔥 AUTO CREATE PROFILE SI MANQUANT
-        if(!profileData){
-          const { data:newProfile } = await supabase
-            .from("users")
-            .insert({
-              id: userData.user.id,
-              email: userData.user.email,
-              is_premium: false
-            })
-            .select()
-            .single()
-
-          profileData = newProfile
-        }
-
-        setProfile(profileData)
-
-        // 💰 SI PREMIUM → LOAD QUESTIONS
-        if(profileData?.is_premium){
-
-          const { data, error } = await supabase.rpc(
-            "get_official_exam_questions",
-            { lang: language.toUpperCase() }
-          )
-
-          if(error){
-            console.error("RPC ERROR:", error)
-            setQuestions([])
-          } else {
-            setQuestions(data || [])
-          }
-        }
-
-      } catch(err){
-        console.error("LOAD ERROR:", err)
-      } finally {
+      if(!userData.user){
         setLoading(false)
+        return
       }
+
+      setUser(userData.user)
+
+      let { data:profileData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userData.user.id)
+        .maybeSingle()
+
+      setProfile(profileData)
+
+      const isOfficialAccess =
+        profileData?.is_premium &&
+        profileData?.premium_expires_at &&
+        new Date(profileData.premium_expires_at) > new Date() &&
+        (profileData?.plan === "official" || profileData?.plan === "master")
+
+      if(isOfficialAccess){
+        const { data } = await supabase.rpc(
+          "get_official_exam_questions",
+          { lang: language.toUpperCase() }
+        )
+
+        setQuestions(data || [])
+      }
+
+      setLoading(false)
     }
 
     loadData()
 
   }, [language])
 
-  // ⏳ LOADING
-  if(loading){
-    return(
-      <div className="p-10 text-center">
-        Loading Official Exam...
-      </div>
-    )
-  }
+  if(loading) return <div className="p-10 text-center">Loading...</div>
 
-  // ❌ NOT LOGGED IN
   if(!user){
-    return(
-      <div className="max-w-xl mx-auto p-10 text-center">
-        <h1 className="text-3xl font-bold mb-4">
-          Login Required 🔐
-        </h1>
-
-        <p className="mb-6">
-          Please login to access the Official Exam.
-        </p>
-
-        <Link
-          href="/login"
-          className="bg-blue-600 text-white px-6 py-3 rounded"
-        >
-          Login
-        </Link>
-      </div>
-    )
-  }
-
-  // ❌ NOT PREMIUM
-  if(!profile?.is_premium){
-    return(
-      <div className="max-w-xl mx-auto p-10 text-center">
-
-        <h1 className="text-3xl font-bold mb-4">
-          Official Exam Mode 🔒
-        </h1>
-
-        <p className="mb-6">
-          Upgrade to Premium to access the Official Exam simulator.
-        </p>
-
-        <Link
-          href="/premium"
-          className="bg-yellow-600 text-white px-6 py-3 rounded"
-        >
-          Upgrade to Premium
-        </Link>
-
-      </div>
-    )
-  }
-
-  // ❌ NO QUESTIONS (anti-crash)
-  if(!questions || questions.length === 0){
-    return(
+    return (
       <div className="p-10 text-center">
-        No questions available for this language.
+        <h1>Login Required 🔐</h1>
+        <Link href="/login">Login</Link>
       </div>
     )
   }
 
-  // ✅ OK
-  return(
-    <div className="max-w-4xl mx-auto p-8">
+  const isExpired =
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) <= new Date()
 
-      <h1 className="text-3xl font-bold text-center mb-6 text-blue-800">
-        Official Exam Mode 🟢
-      </h1>
+  const isOfficialAccess =
+    profile?.is_premium &&
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) > new Date() &&
+    (profile?.plan === "official" || profile?.plan === "master")
 
-      <div className="flex justify-center">
-        <Exam
-          questions={questions}
-          mode="exam"
-          onRetry={() => window.location.reload()}
-/>
+  if(!isOfficialAccess){
+    return (
+      <div className="p-10 text-center">
+
+        <h1 className="text-3xl mb-4">Official 🔒</h1>
+
+        {isExpired ? (
+          <p className="text-red-600 mb-6">Your access expired</p>
+        ) : (
+          <p className="mb-6">Upgrade to Official</p>
+        )}
+
+        <Link href="/premium" className="bg-yellow-500 px-6 py-3 rounded text-white">
+          Upgrade
+        </Link>
       </div>
+    )
+  }
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+
+      <h1 className="text-3xl text-center mb-4">Official Mode 🟢</h1>
+
+      <Exam
+        questions={questions}
+        mode="exam"
+        onRetry={() => window.location.reload()}
+      />
 
     </div>
   )
-
 }

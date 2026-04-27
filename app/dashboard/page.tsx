@@ -25,63 +25,92 @@ export default async function DashboardPage() {
     }
   )
 
-  // 🔐 Vérifier utilisateur
+  // 🔐 USER
   const {
     data: { user }
   } = await supabase.auth.getUser()
 
   if (!user) redirect("/login")
 
-  // 📊 Récupérer les tentatives
+  // 📊 ATTEMPTS
   const { data: attempts } = await supabase
     .from("exam_attempts")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
-  // 📊 Stats
+  // 📊 STATS
   const total = attempts?.length || 0
   const passed = attempts?.filter(a => a.passed).length || 0
 
   const avg =
-    attempts && attempts.length > 0
+    total > 0
       ? Math.round(
-          attempts.reduce((sum, a) => sum + a.percentage, 0) /
-            attempts.length
+          attempts!.reduce((sum, a) => sum + a.percentage, 0) / total
         )
       : 0
 
-  // ⚠️ Weak Areas
-  const { data: weakAreas } = await supabase
-    .rpc("get_user_weak_categories", {
+  const best =
+    total > 0
+      ? Math.max(...attempts!.map(a => a.percentage))
+      : 0
+
+  const passRate =
+    total > 0 ? Math.round((passed / total) * 100) : 0
+
+  const last = attempts?.[0]?.percentage || 0
+  const prev = attempts?.[1]?.percentage || 0
+  const trend = last - prev
+
+  // ⚠️ WEAK AREAS
+  const { data: weakAreas } = await supabase.rpc(
+    "get_user_weak_categories",
+    {
       user_id_input: user.id
-    })
+    }
+  )
 
   return (
     <main className="p-8 max-w-5xl mx-auto">
+
       <h1 className="text-3xl font-bold mb-8">
         Your Performance Dashboard 📊
       </h1>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-6 mb-10">
+      {/* 🚀 CTA */}
+      <Link href="/official">
+        <div className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl mb-6 text-center transition">
+          Take Official Exam 🚀
+        </div>
+      </Link>
+
+      {/* 📊 STATS */}
+      <div className="grid md:grid-cols-5 gap-6 mb-10">
         <Card title="Total Exams" value={total} />
         <Card title="Passed" value={passed} />
-        <Card title="Average Score" value={`${avg}%`} />
-
-        <Link href="/learning">
-          <div className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-xl shadow-md text-center cursor-pointer transition">
-            <div className="text-lg font-semibold">
-              Learning Mode
-            </div>
-            <div className="text-sm opacity-80 mt-1">
-              Practice weak areas
-            </div>
-          </div>
-        </Link>
+        <Card title="Average" value={`${avg}%`} />
+        <Card title="Best Score" value={`${best}%`} />
+        <Card title="Pass Rate" value={`${passRate}%`} />
       </div>
 
-      {/* Progress Chart */}
+      {/* 📉 TREND */}
+      {total > 1 && (
+        <div className="mb-10">
+          <Card
+            title="Trend"
+            value={`${trend > 0 ? "+" : ""}${trend}%`}
+          />
+        </div>
+      )}
+
+      {/* ⚡ ENGAGEMENT */}
+      {total < 3 && (
+        <div className="bg-yellow-100 p-4 rounded mb-10 text-center">
+          Keep practicing to unlock full insights 📊
+        </div>
+      )}
+
+      {/* 📈 CHART */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-10">
         <h2 className="text-xl font-semibold mb-4">
           Score Progression
@@ -97,7 +126,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Weak Areas */}
+      {/* ⚠️ WEAK AREAS */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-10">
         <h2 className="text-xl font-semibold mb-4">
           Weak Areas ⚠️
@@ -127,14 +156,14 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Attempts */}
+      {/* 🕘 RECENT ATTEMPTS */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-4">
           Recent Attempts
         </h2>
 
         <div className="space-y-3">
-          {attempts?.map(a => (
+          {attempts?.slice(0, 10).map(a => (
             <div
               key={a.id}
               className="flex justify-between border p-4 rounded-lg"
@@ -151,15 +180,19 @@ export default async function DashboardPage() {
 
               <div
                 className={`font-bold ${
-                  a.passed ? "text-green-600" : "text-red-600"
+                  a.passed
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
-                {a.percentage}% {a.passed ? "✅" : "❌"}
+                {a.score}/{a.total_score} ({a.percentage}%)
+                {a.passed ? " ✅" : " ❌"}
               </div>
             </div>
           ))}
         </div>
       </div>
+
     </main>
   )
 }
