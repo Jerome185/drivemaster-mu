@@ -35,13 +35,14 @@ export default function OfficialPage(){
         }
 
         setUser(userData.user)
+        
 
         // 👤 PROFILE
         let { data:profileData } = await supabase
           .from("users")
           .select("*")
           .eq("id", userData.user.id)
-          .single()
+          .maybeSingle()
 
         // 🔥 AUTO CREATE PROFILE SI MANQUANT
         if(!profileData){
