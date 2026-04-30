@@ -1,13 +1,13 @@
-'use client'
+"use client"
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import { useRouter } from "next/navigation"
-import { useLanguage } from "../contexts/LanguageContext"
+import { useLanguage } from "@/app/contexts/LanguageContext"
+import { getTranslator } from "@/lib/i18n"
 
 type Category = {
   id: string
-  code: string
   name: string
 }
 
@@ -20,6 +20,7 @@ export default function LearningPage() {
 
   const { language } = useLanguage()
   const router = useRouter()
+  const t = getTranslator(language)
 
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -32,28 +33,26 @@ export default function LearningPage() {
 
       setLoading(true)
 
-      const lang = language.toUpperCase()
-
       const { data, error } = await supabase
-        .from("categories")
+        .from("questions")
         .select(`
-          id,
-          code,
-          category_translations!inner(name, language_code)
+          categories (id, name),
+          question_translations!inner (language_code)
         `)
-        .eq("category_translations.language_code", lang)
+        .eq("question_translations.language_code", language.toUpperCase())
+        .eq("is_active", true)
 
-      if (error) {
-        console.error("Error fetching categories:", error)
-      } else {
+      if (!error) {
+        const map = new Map<string, Category>()
 
-        const formatted = data.map((cat: any) => ({
-          id: cat.id,
-          code: cat.code,
-          name: cat.category_translations[0]?.name
-        }))
+        data?.forEach((item: any) => {
+          const cat = item.categories
+          if (cat && !map.has(cat.id)) {
+            map.set(cat.id, cat)
+          }
+        })
 
-        setCategories(formatted)
+        setCategories(Array.from(map.values()))
       }
 
       setLoading(false)
@@ -64,7 +63,7 @@ export default function LearningPage() {
   }, [language])
 
   if (loading) {
-    return <p className="text-center mt-10">Loading...</p>
+    return <p className="text-center mt-10">{t("loading")}</p>
   }
 
   return (
@@ -74,20 +73,15 @@ export default function LearningPage() {
         {language === "fr" ? "Mode Apprentissage 🧠" : "Learning Mode 🧠"}
       </h1>
 
-      <p className="text-gray-500 mb-6">
-        {categories.length}{" "}
-        {language === "fr"
-          ? "catégories disponibles"
-          : "categories available"}
-      </p>
-
       <div className="grid grid-cols-2 gap-4">
 
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => router.push(`/learning/${cat.code}?lang=${language.toUpperCase()}`)} // ✅ FIX FINAL
-            className="border p-4 rounded-lg hover:bg-gray-100 transition"
+            onClick={() =>
+              router.push(`/learning/${cat.id}?lang=${language}`)
+            }
+            className="border p-4 rounded-lg hover:bg-gray-100"
           >
             {cat.name}
           </button>

@@ -46,10 +46,18 @@ export default function Header() {
     router.push("/login")
   }
 
+  // 🔥 FIX LANGUE
+  const changeLanguage = (lang: "en" | "fr") => {
+    setLanguage(lang)
+
+    const path = window.location.pathname
+    router.push(`${path}?lang=${lang}`)
+    router.refresh()
+  }
+
   return (
     <header className="bg-gray-100 shadow-sm">
 
-      {/* TOP BAR */}
       <div className="flex justify-between items-center px-4 py-3">
 
         <Link href="/" className="font-bold text-lg text-blue-700">
@@ -74,14 +82,13 @@ export default function Header() {
           {/* LANGUAGE */}
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
+            onChange={(e) => changeLanguage(e.target.value as "en" | "fr")}
             className="border rounded px-2 py-1 text-sm"
           >
             <option value="en">EN</option>
             <option value="fr">FR</option>
           </select>
 
-          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
@@ -99,7 +106,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* MOBILE BUTTON */}
+        {/* MOBILE */}
         <button
           className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -124,43 +131,15 @@ export default function Header() {
             {t.master}
           </Link>
 
-          {user && (
-            <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
-              {t.dashboard}
-            </Link>
-          )}
-
-          {isAdmin && (
-            <Link href="/admin" onClick={() => setMenuOpen(false)}>
-              {t.admin}
-            </Link>
-          )}
-
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value as "en" | "fr")}
+            onChange={(e) => changeLanguage(e.target.value as "en" | "fr")}
             className="border rounded px-2 py-1 text-sm"
           >
             <option value="en">EN</option>
             <option value="fr">FR</option>
           </select>
 
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-3 py-2 rounded"
-            >
-              {t.logout}
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              className="bg-blue-600 text-white px-3 py-2 rounded"
-            >
-              {t.login}
-            </Link>
-          )}
         </div>
       )}
     </header>

@@ -24,6 +24,8 @@ export default function MasterPage() {
 
     const loadData = async () => {
 
+      setQuestions([]) // 🔥 reset
+
       const { data:userData } = await supabase.auth.getUser()
 
       if(!userData.user){
@@ -63,72 +65,38 @@ export default function MasterPage() {
 
   }, [language])
 
-  if(loading) return <div className="p-10 text-center">Loading...</div>
+  if(loading){
+    return <div className="p-10 text-center">Loading...</div>
+  }
 
   if(!user){
     return (
       <div className="p-10 text-center">
-        <h1>Login Required 🔐</h1>
+        Login Required 🔐
         <Link href="/login">Login</Link>
       </div>
     )
   }
 
-  const isExpired =
-    profile?.premium_expires_at &&
-    new Date(profile.premium_expires_at) <= new Date()
-
-  const isMasterAccess =
-    profile?.is_premium &&
-    profile?.premium_expires_at &&
-    new Date(profile.premium_expires_at) > new Date() &&
-    profile?.plan === "master"
-
-  // 🔥 USER OFFICIAL → PROPOSE UPGRADE
-  if(profile?.plan === "official"){
+  if(!questions.length){
     return (
       <div className="p-10 text-center">
-
-        <h1 className="text-3xl mb-4">Master Mode 🔥</h1>
-
-        <p className="mb-6">
-          Upgrade to Master to unlock advanced exams
-        </p>
-
-        <Link href="/premium" className="bg-red-600 px-6 py-3 text-white rounded">
-          Upgrade to Master
-        </Link>
-      </div>
-    )
-  }
-
-  if(!isMasterAccess){
-    return (
-      <div className="p-10 text-center">
-
-        <h1 className="text-3xl mb-4">Master 🔒</h1>
-
-        {isExpired ? (
-          <p className="text-red-600 mb-6">Your access expired</p>
-        ) : (
-          <p className="mb-6">Upgrade to Master</p>
-        )}
-
-        <Link href="/premium" className="bg-red-600 px-6 py-3 text-white rounded">
-          Upgrade
-        </Link>
+        {language === "fr"
+          ? "Aucune question disponible"
+          : "No questions available"}
       </div>
     )
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto p-8">
 
-      <h1 className="text-3xl text-center mb-4 text-red-700">
+      <h1 className="text-3xl text-center mb-6 text-red-700">
         Master Mode 🔥
       </h1>
 
       <Exam
+        key={language} // 🔥 FORCE RELOAD
         questions={questions}
         mode="exam"
         onRetry={() => window.location.reload()}
