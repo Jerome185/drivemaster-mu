@@ -1,7 +1,6 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { useState } from "react"
 
 type Question = {
   id: string
@@ -17,57 +16,23 @@ type Question = {
 
 type ExamProps = {
   questions: Question[]
-  mode?: 'learning' | 'exam'
   onRetry?: () => void
 }
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export default function Exam({ questions, onRetry }: ExamProps) {
 
-export default function Exam({ questions, mode = 'learning', onRetry }: ExamProps) {
-
-  const isExam = mode === 'exam'
-
-  // 🔥 SAFE QUESTIONS
+  // 🔒 sécurité + limite
   const safeQuestions = Array.from(
     new Map(questions.map(q => [q.id, q])).values()
-  ).slice(0, isExam ? 35 : 10)
+  ).slice(0, 10)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
 
-  const [timeLeft, setTimeLeft] = useState(1800)
-  const [saved, setSaved] = useState(false)
-
   const currentQuestion = safeQuestions[currentIndex]
-
-  // ⏱ TIMER
-  useEffect(() => {
-    if (!isExam || showResult) return
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          setShowResult(true)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [isExam, showResult])
-
-  const formatTime = (sec: number) => {
-    const min = Math.floor(sec / 60)
-    const s = sec % 60
-    return `${min}:${s.toString().padStart(2, '0')}`
-  }
+  const progress = ((currentIndex + 1) / safeQuestions.length) * 100
 
   const handleAnswer = (option: string) => {
     if (selected) return
@@ -88,110 +53,70 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
     }
   }
 
-  // 💾 SAVE ATTEMPT
-  const saveAttempt = async (score: number, total: number) => {
-    const { data: userData } = await supabase.auth.getUser()
-    if (!userData.user) return
-
-    const percentage = Math.round((score / total) * 100)
-    const passed = score >= 30
-
-    await supabase.from('exam_attempts').insert({
-      user_id: userData.user.id,
-      exam_level: 'official',
-      score: score,
-      total_score: total,
-      percentage: percentage,
-      passed: passed
-    })
-  }
-
-  // 🔒 SAVE ONCE
-  useEffect(() => {
-    if (showResult && isExam && !saved) {
-      saveAttempt(score, safeQuestions.length)
-      setSaved(true)
-    }
-  }, [showResult])
-
-  // 🎯 RESULT
+  // 🎯 RESULT SCREEN
   if (showResult) {
-
     const total = safeQuestions.length
     const percentage = Math.round((score / total) * 100)
-    const passed = isExam ? score >= 30 : true
 
     return (
       <div className="text-center">
 
         <h2 className="text-3xl font-bold mb-4">
-          {isExam
-            ? passed
-              ? '✅ PASSED'
-              : '❌ FAILED'
-            : 'Résultat'}
+          🎯 Résultat
         </h2>
 
-        <p className="text-lg mb-2">
-          Score: {score} / {total}
+        <p className="text-xl mb-2">
+          {score} / {total}
         </p>
 
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-500 mb-6">
           {percentage}%
         </p>
 
-        {isExam && (
-          <p className="mb-6">
-            {passed
-              ? 'Congratulations! You passed the exam.'
-              : 'You did not reach the passing score (30).'}
-          </p>
-        )}
-
         <button
           onClick={() => onRetry?.()}
-          className="bg-blue-600 text-white px-6 py-3 rounded"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition"
         >
           Recommencer
         </button>
-
       </div>
     )
   }
 
   return (
-    <div className="bg-white shadow p-6 rounded-lg max-w-2xl mx-auto">
+    <div className="bg-white shadow-lg p-6 rounded-2xl w-full max-w-2xl">
 
-      {/* HEADER */}
-      <div className="flex justify-between mb-4 text-sm font-semibold">
-        <span>
+      {/* 📊 PROGRESS BAR */}
+      <div className="mb-4">
+        <div className="w-full bg-gray-200 h-2 rounded-full">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <p className="text-sm text-gray-500 mt-1">
           Question {currentIndex + 1} / {safeQuestions.length}
-        </span>
-
-        {isExam && (
-          <span className="text-red-600">
-            ⏱ {formatTime(timeLeft)}
-          </span>
-        )}
+        </p>
       </div>
 
-      {/* QUESTION */}
+      {/* ❓ QUESTION */}
       <h2 className="text-lg font-semibold mb-4">
         {currentQuestion.question_text}
       </h2>
 
-      {/* IMAGE */}
+      {/* 🖼 IMAGE */}
       {currentQuestion.image_url && (
         <img
           src={currentQuestion.image_url}
           alt="question"
-          className="mb-4 max-h-60 mx-auto"
+          className="mb-4 max-h-60 mx-auto rounded-lg"
         />
       )}
 
-      {/* OPTIONS */}
+      {/* 🔘 OPTIONS */}
       <div className="grid gap-3">
-        {(['A', 'B', 'C', 'D'] as const).map((key) => {
+
+        {(["A", "B", "C", "D"] as const).map((key) => {
 
           const optionText =
             currentQuestion[`option_${key.toLowerCase()}` as keyof Question] as string
@@ -199,13 +124,16 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
           const isCorrect = key === currentQuestion.correct_option
           const isSelected = selected === key
 
-          let style = "border p-3 rounded text-left"
+          let style =
+            "border p-4 rounded-xl text-left transition-all duration-150"
+
+          if (!selected) {
+            style += " hover:bg-gray-100"
+          }
 
           if (selected) {
-            if (isCorrect) style += " bg-green-200"
-            else if (isSelected) style += " bg-red-200"
-          } else {
-            style += " hover:bg-gray-100"
+            if (isCorrect) style += " bg-green-100 border-green-400"
+            else if (isSelected) style += " bg-red-100 border-red-400"
           }
 
           return (
@@ -219,22 +147,23 @@ export default function Exam({ questions, mode = 'learning', onRetry }: ExamProp
             </button>
           )
         })}
+
       </div>
 
-      {/* EXPLANATION */}
-      {!isExam && selected && (
-        <div className="mt-4 text-sm text-gray-700">
+      {/* 📘 EXPLANATION */}
+      {selected && (
+        <div className="mt-4 text-sm text-gray-700 bg-gray-50 p-3 rounded">
           <strong>Explication:</strong> {currentQuestion.explanation}
         </div>
       )}
 
-      {/* NEXT */}
+      {/* ➡️ NEXT */}
       {selected && (
         <button
           onClick={handleNext}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded w-full"
+          className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
         >
-          {isExam ? 'Next' : 'Suivant'}
+          Suivant
         </button>
       )}
 

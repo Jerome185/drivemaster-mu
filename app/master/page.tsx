@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import Exam from "../../components/Exam"
+import Exam from "@/components/Exam"
 import { useLanguage } from "@/app/contexts/LanguageContext"
+import { getTranslator } from "@/lib/i18n"
 import Link from "next/link"
 
 const supabase = createBrowserClient(
@@ -14,92 +15,181 @@ const supabase = createBrowserClient(
 export default function MasterPage() {
 
   const { language } = useLanguage()
+  const t = getTranslator(language)
 
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [questions, setQuestions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const loadData = async () => {
 
-    const loadData = async () => {
+    setLoading(true)
+    setQuestions([])
 
-      setQuestions([]) // 🔥 reset
+    const { data:userData } = await supabase.auth.getUser()
 
-      const { data:userData } = await supabase.auth.getUser()
-
-      if(!userData.user){
-        setLoading(false)
-        return
-      }
-
-      setUser(userData.user)
-
-      let { data:profileData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userData.user.id)
-        .maybeSingle()
-
-      setProfile(profileData)
-
-      const isMasterAccess =
-        profileData?.is_premium &&
-        profileData?.premium_expires_at &&
-        new Date(profileData.premium_expires_at) > new Date() &&
-        profileData?.plan === "master"
-
-      if(isMasterAccess){
-        const { data } = await supabase.rpc(
-          "get_master_exam_questions",
-          { lang: language.toUpperCase() }
-        )
-
-        setQuestions(data || [])
-      }
-
+    if(!userData.user){
+      setUser(null)
       setLoading(false)
+      return
     }
 
-    loadData()
+    setUser(userData.user)
 
-  }, [language])
+    let { data:profileData } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", userData.user.id)
+      .maybeSingle()
 
-  if(loading){
-    return <div className="p-10 text-center">Loading...</div>
+    setProfile(profileData)
+
+    const isMasterAccess =
+      profileData?.is_premium &&
+      profileData?.premium_expires_at &&
+      new Date(profileData.premium_expires_at) > new Date() &&
+      profileData?.plan === "master"
+
+    if(isMasterAccess){
+      const { data, error } = await supabase.rpc(
+        "get_master_exam_questions",
+        { lang: language.toUpperCase() }
+      )
+
+      if(error){
+        console.error("RPC ERROR:", error)
+        setQuestions([])
+      } else {
+        setQuestions(data || [])
+      }
+    }
+
+    setLoading(false)
   }
 
-  if(!user){
+  useEffect(() => {
+    loadData()
+  }, [language])
+
+  // ⏳ LOADING
+  if(loading){
     return (
       <div className="p-10 text-center">
-        Login Required 🔐
-        <Link href="/login">Login</Link>
+        {t("loading")}
       </div>
     )
   }
 
+  // ❌ NOT LOGGED
+  if(!user){
+    return (
+      <div className="p-10 text-center space-y-4">
+        <p>{t("loginRequired")} 🔐</p>
+
+        <Link
+          href="/login"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          {t("login")}
+        </Link>
+      </div>
+    )
+  }
+
+  const isExpired =
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) <= new Date()
+
+  const isMasterAccess =
+    profile?.is_premium &&
+    profile?.premium_expires_at &&
+    new Date(profile.premium_expires_at) > new Date() &&
+    profile?.plan === "master"
+
+  // 🔥 USER OFFICIAL → UPSELL MASTER
+  if(profile?.plan === "official"){
+    return (
+      <div className="p-10 text-center space-y-4">
+
+        <h1 className="text-3xl font-bold text-red-700">
+          {language === "fr" ? "Mode Master 🔥" : "Master Mode 🔥"}
+        </h1>
+
+        <p>
+          {language === "fr"
+            ? "Passe à Master pour débloquer les examens avancés"
+            : "Upgrade to Master to unlock advanced exams"}
+        </p>
+
+        <Link
+          href="/premium"
+          className="bg-red-600 px-6 py-3 text-white rounded"
+        >
+          {language === "fr"
+            ? "Passer à Master"
+            : "Upgrade to Master"}
+        </Link>
+      </div>
+    )
+  }
+
+  // ❌ NO ACCESS
+  if(!isMasterAccess){
+    return (
+      <div className="p-10 text-center space-y-4">
+
+        <h1 className="text-3xl font-bold">
+          Master 🔒
+        </h1>
+
+        {isExpired ? (
+          <p className="text-red-600">
+            {language === "fr"
+              ? "Ton accès a expiré"
+              : "Your access expired"}
+          </p>
+        ) : (
+          <p>
+            {language === "fr"
+              ? "Passe à Master pour accéder"
+              : "Upgrade to Master"}
+          </p>
+        )}
+
+        <Link
+          href="/premium"
+          className="bg-red-600 px-6 py-3 text-white rounded"
+        >
+          {t("upgrade")}
+        </Link>
+      </div>
+    )
+  }
+
+  // ❌ NO QUESTIONS
   if(!questions.length){
     return (
       <div className="p-10 text-center">
-        {language === "fr"
-          ? "Aucune question disponible"
-          : "No questions available"}
+        {t("noQuestions")}
       </div>
     )
   }
 
+  // ✅ MAIN
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="p-8 max-w-4xl mx-auto">
 
-      <h1 className="text-3xl text-center mb-6 text-red-700">
-        Master Mode 🔥
+      <h1 className="text-3xl text-center mb-6 font-bold text-red-700">
+        {language === "fr"
+          ? "Mode Master 🔥"
+          : "Master Mode 🔥"}
       </h1>
 
       <Exam
-        key={language} // 🔥 FORCE RELOAD
+        key={language}
         questions={questions}
-        mode="exam"
-        onRetry={() => window.location.reload()}
+        onRetry={loadData} // ✅ clean retry
       />
 
     </div>
