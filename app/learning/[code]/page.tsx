@@ -13,7 +13,10 @@ export default function LearningCategoryPage() {
   const { code } = useParams() as { code: string }
 
   const { language } = useLanguage()
-  const lang = language.toUpperCase()
+
+  const lang = language?.toUpperCase().trim()
+  const safeCode = code?.toUpperCase().trim()
+
   const t = getTranslator(language)
 
   const [questions, setQuestions] = useState<any[]>([])
@@ -22,14 +25,18 @@ export default function LearningCategoryPage() {
   const fetchQuestions = async () => {
 
     setLoading(true)
-    setQuestions([]) // 🔥 reset
+    setQuestions([])
 
     try {
+
+      console.log("LANG:", lang)
+      console.log("CATEGORY CODE:", safeCode)
+
       const { data, error } = await supabase.rpc(
         "get_learning_questions",
         {
           lang: lang,
-          category_code: code,
+          category_code: safeCode,
         }
       )
 
@@ -37,6 +44,7 @@ export default function LearningCategoryPage() {
         console.error("RPC ERROR:", error)
         setQuestions([])
       } else {
+        console.log("QUESTIONS:", data)
         setQuestions(data || [])
       }
 
@@ -49,9 +57,9 @@ export default function LearningCategoryPage() {
   }
 
   useEffect(() => {
-    if (!code || !language) return
+    if (!safeCode || !lang) return
     fetchQuestions()
-  }, [code, language]) // ✅ FIX MAJEUR
+  }, [safeCode, lang])
 
   // ⏳ LOADING
   if (loading) {
@@ -74,13 +82,11 @@ export default function LearningCategoryPage() {
   // ✅ MAIN
   return (
     <div className="max-w-4xl mx-auto p-6">
-
       <Exam
-        key={language} // 🔥 force re-render
+        key={language}
         questions={questions}
         onRetry={fetchQuestions}
       />
-
     </div>
   )
 }

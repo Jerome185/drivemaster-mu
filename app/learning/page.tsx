@@ -7,7 +7,7 @@ import { useLanguage } from "@/app/contexts/LanguageContext"
 import { getTranslator } from "@/lib/i18n"
 
 type Category = {
-  id: string
+  code: string
   name: string
 }
 
@@ -36,19 +36,42 @@ export default function LearningPage() {
       const { data, error } = await supabase
         .from("questions")
         .select(`
-          categories (id, name),
-          question_translations!inner (language_code)
+          categories (
+            id,
+            code,
+            category_translations!inner (
+              name,
+              language_code
+            )
+          ),
+          question_translations!inner (
+            language_code
+          )
         `)
         .eq("question_translations.language_code", language.toUpperCase())
+        .eq("categories.category_translations.language_code", language.toUpperCase())
         .eq("is_active", true)
 
-      if (!error && data) {
+      if (error) {
+        console.error("ERROR FETCH CATEGORIES:", error)
+        setCategories([])
+      } else if (data) {
+
         const map = new Map<string, Category>()
 
         data.forEach((item: any) => {
           const cat = item.categories
-          if (cat && !map.has(cat.id)) {
-            map.set(cat.id, cat)
+
+          if (cat && cat.category_translations?.length > 0) {
+
+            const category: Category = {
+              code: cat.code, // 🔥 IMPORTANT
+              name: cat.category_translations[0].name
+            }
+
+            if (!map.has(category.code)) {
+              map.set(category.code, category)
+            }
           }
         })
 
@@ -90,10 +113,8 @@ export default function LearningPage() {
 
         {categories.map((cat) => (
           <button
-            key={cat.id}
-            onClick={() =>
-              router.push(`/learning/${cat.id}`)
-            }
+            key={cat.code}
+            onClick={() => router.push(`/learning/${cat.code}`)} // 🔥 FIX CRITIQUE
             className="group border rounded-2xl p-5 bg-white shadow-sm hover:shadow-lg transition-all duration-200 text-left"
           >
             <div className="flex items-center justify-between">
