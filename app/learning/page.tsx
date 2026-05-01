@@ -92,7 +92,7 @@ export default function LearningPage() {
           <button
             key={cat.id}
             onClick={() =>
-              router.push(`/learning/${cat.id}?lang=${language}`)
+              router.push(`/learning/${cat.id}`)
             }
             className="group border rounded-2xl p-5 bg-white shadow-sm hover:shadow-lg transition-all duration-200 text-left"
           >
