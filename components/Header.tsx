@@ -3,15 +3,13 @@
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import Link from "next/link"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { translations } from "@/lib/translations"
 
 export default function Header() {
 
   const router = useRouter()
-  const pathname = usePathname()
-
   const { language, setLanguage } = useLanguage()
   const t = translations[language]
 
@@ -48,52 +46,32 @@ export default function Header() {
     router.push("/login")
   }
 
-  // 🔥 LANG SWITCH
+  // 🔥 FIX LANGUE
   const changeLanguage = (lang: "en" | "fr") => {
     setLanguage(lang)
+
     const path = window.location.pathname
     router.push(`${path}?lang=${lang}`)
     router.refresh()
   }
 
-  // 🔥 LINK STYLE
-  const linkClass = (path: string) =>
-    `transition ${
-      pathname === path
-        ? "text-blue-700 font-semibold"
-        : "text-gray-600 hover:text-blue-600"
-    }`
-
   return (
-    <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
+    <header className="bg-gray-100 shadow-sm">
 
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="flex justify-between items-center px-4 py-3">
 
-        {/* LOGO */}
-        <Link href="/" className="text-xl font-bold text-blue-700">
+        <Link href="/" className="font-bold text-lg text-blue-700">
           DriveMaster MU 🚗
         </Link>
 
-        {/* DESKTOP MENU */}
+        {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
 
-          <Link href="/learning" className={linkClass("/learning")}>
-            {t.learning}
-          </Link>
+          <Link href="/learning">{t.learning}</Link>
+          <Link href="/official">{t.official}</Link>
+          <Link href="/master">{t.master}</Link>
 
-          <Link href="/official" className={linkClass("/official")}>
-            {t.official}
-          </Link>
-
-          <Link href="/master" className={linkClass("/master")}>
-            {t.master}
-          </Link>
-
-          {user && (
-            <Link href="/dashboard" className={linkClass("/dashboard")}>
-              {t.dashboard}
-            </Link>
-          )}
+          {user && <Link href="/dashboard">{t.dashboard}</Link>}
 
           {isAdmin && (
             <Link href="/admin" className="text-purple-600 font-semibold">
@@ -101,49 +79,34 @@ export default function Header() {
             </Link>
           )}
 
-          {/* 🔥 LANGUAGE SWITCH (STYLE PRO) */}
-          <div className="flex border rounded overflow-hidden text-sm">
-            <button
-              onClick={() => changeLanguage("en")}
-              className={`px-2 py-1 ${
-                language === "en"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100"
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => changeLanguage("fr")}
-              className={`px-2 py-1 ${
-                language === "fr"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100"
-              }`}
-            >
-              FR
-            </button>
-          </div>
+          {/* LANGUAGE */}
+          <select
+            value={language}
+            onChange={(e) => changeLanguage(e.target.value as "en" | "fr")}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+          </select>
 
-          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition"
+              className="bg-red-500 text-white px-3 py-1 rounded"
             >
               {t.logout}
             </button>
           ) : (
             <Link
               href="/login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
+              className="bg-blue-600 text-white px-3 py-1 rounded"
             >
               {t.login}
             </Link>
           )}
         </div>
 
-        {/* MOBILE BUTTON */}
+        {/* MOBILE */}
         <button
           className="md:hidden text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -154,7 +117,7 @@ export default function Header() {
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t bg-white">
+        <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t">
 
           <Link href="/learning" onClick={() => setMenuOpen(false)}>
             {t.learning}
@@ -168,44 +131,15 @@ export default function Header() {
             {t.master}
           </Link>
 
-          {user && (
-            <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
-              {t.dashboard}
-            </Link>
-          )}
+          <select
+            value={language}
+            onChange={(e) => changeLanguage(e.target.value as "en" | "fr")}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+          </select>
 
-          {/* LANGUAGE MOBILE */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => changeLanguage("en")}
-              className="border px-2 py-1 rounded"
-            >
-              EN
-            </button>
-            <button
-              onClick={() => changeLanguage("fr")}
-              className="border px-2 py-1 rounded"
-            >
-              FR
-            </button>
-          </div>
-
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-3 py-2 rounded"
-            >
-              {t.logout}
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              className="bg-blue-600 text-white px-3 py-2 rounded"
-            >
-              {t.login}
-            </Link>
-          )}
         </div>
       )}
     </header>
