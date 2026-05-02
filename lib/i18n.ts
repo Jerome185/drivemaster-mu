@@ -1,6 +1,7 @@
 export const translations = {
   fr: {
     login: "Connexion",
+    logout: "Déconnexion",
     loading: "Chargement...",
     noQuestions: "Aucune question disponible",
     loginRequired: "Connexion requise",
@@ -34,6 +35,7 @@ export const translations = {
 
   en: {
     login: "Login",
+    logout: "Logout",
     loading: "Loading...",
     noQuestions: "No questions available",
     loginRequired: "Login required",
