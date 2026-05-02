@@ -69,7 +69,7 @@ export const translations = {
 export const getTranslator = (lang: string) => {
   const l = lang?.toLowerCase() === "fr" ? "fr" : "en"
 
-  return (key: keyof typeof translations.fr) => {
-    return translations[l][key] || key
+  return (key: string) => {
+    return translations[l][key as keyof typeof translations.fr] || key
   }
 }

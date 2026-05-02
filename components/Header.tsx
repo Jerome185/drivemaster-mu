@@ -13,7 +13,10 @@ export default function Header() {
   const pathname = usePathname()
 
   const { language, setLanguage } = useLanguage()
-  const t = getTranslator(language)
+
+  // 🔥 FIX TYPE TS
+  const t = getTranslator(language) as (key: string) => string
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -23,7 +26,6 @@ export default function Header() {
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // ✅ ADMIN VIA DB
   const isAdmin = profile?.is_admin === true
 
   useEffect(() => {
@@ -79,15 +81,13 @@ export default function Header() {
     router.push("/login")
   }
 
-const changeLanguage = (lang: "en" | "fr") => {
-  setLanguage(lang)
+  const changeLanguage = (lang: "en" | "fr") => {
+    setLanguage(lang)
 
-  // ✅ AJOUT COOKIE (clé du fix)
-  document.cookie = `language=${lang}; path=/`
+    document.cookie = `language=${lang}; path=/`
 
-  // ✅ garder ton comportement actuel (aucun impact)
-  const path = window.location.pathname
-  router.push(`${path}?lang=${lang}`)
+    const path = window.location.pathname
+    router.push(`${path}?lang=${lang}`)
     router.refresh()
   }
 
@@ -110,29 +110,29 @@ const changeLanguage = (lang: "en" | "fr") => {
         {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
 
-         <Link href="/learning" className={linkClass("/learning")}>
-            {t.learning} 🎓
+          <Link href="/learning" className={linkClass("/learning")}>
+            {t("learning")} 🎓
           </Link>
 
           <Link href="/official" className={linkClass("/official")}>
-            {t.official} 🟢
+            {t("official")} 🟢
           </Link>
 
           <Link href="/master" className={linkClass("/master")}>
-            {t.master} 🔥
+            {t("master")} 🔥
           </Link>
 
           {user && (
-          <Link href="/dashboard" className={linkClass("/dashboard")}>
-            {t.dashboard} 📊
-          </Link>
-        )}
+            <Link href="/dashboard" className={linkClass("/dashboard")}>
+              {t("dashboard")} 📊
+            </Link>
+          )}
 
-            {isAdmin && (
-          <Link href="/admin" className="text-purple-600 font-semibold">
-            {t.admin} ⚙️
-          </Link>
-        )}
+          {isAdmin && (
+            <Link href="/admin" className="text-purple-600 font-semibold">
+              {t("admin")} ⚙️
+            </Link>
+          )}
 
           {/* LANG */}
           <div className="flex border rounded overflow-hidden text-sm">
@@ -159,11 +159,11 @@ const changeLanguage = (lang: "en" | "fr") => {
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-1 rounded"
             >
-              {t.logout}
+              {t("logout")}
             </button>
           ) : (
             <Link href="/login" className="bg-blue-600 text-white px-3 py-1 rounded">
-              {t.login}
+              {t("login")}
             </Link>
           )}
         </div>
@@ -182,27 +182,26 @@ const changeLanguage = (lang: "en" | "fr") => {
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t bg-white">
 
           <Link href="/learning" onClick={() => setMenuOpen(false)}>
-            {t.learning}
+            {t("learning")}
           </Link>
 
           <Link href="/official" onClick={() => setMenuOpen(false)}>
-            {t.official}
+            {t("official")}
           </Link>
 
           <Link href="/master" onClick={() => setMenuOpen(false)}>
-            {t.master}
+            {t("master")}
           </Link>
 
           {user && (
             <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
-              {t.dashboard}
+              {t("dashboard")}
             </Link>
           )}
 
-          {/* 🔥 ADMIN MOBILE FIX */}
           {isAdmin && (
             <Link href="/admin" onClick={() => setMenuOpen(false)}>
-              {t.admin}
+              {t("admin")}
             </Link>
           )}
 
@@ -217,11 +216,11 @@ const changeLanguage = (lang: "en" | "fr") => {
 
           {user ? (
             <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-2 rounded">
-              {t.logout}
+              {t("logout")}
             </button>
           ) : (
             <Link href="/login" onClick={() => setMenuOpen(false)} className="bg-blue-600 text-white px-3 py-2 rounded">
-              {t.login}
+              {t("login")}
             </Link>
           )}
         </div>
