@@ -78,7 +78,23 @@ export const translations = {
     examfinished: "Examen terminé",
     score: "Score",
     success: "Bien joué !",
-    fail: "Continue à t'entraîner !"
+    fail: "Continue à t'entraîner !",
+
+    // 🔥 DASHBOARD
+    dashboardTitle: "Ton tableau de performance",
+    takeExam: "Passer l'examen officiel",
+    totalExams: "Examens passés",
+    passed: "Réussis",
+    average: "Moyenne",
+    bestScore: "Meilleur score",
+    passRate: "Taux de réussite",
+    trend: "Tendance",
+    keepPracticing: "Continue à t'entraîner pour débloquer toutes les statistiques",
+    scoreProgression: "Progression des scores",
+    weakAreas: "Points faibles",
+    noWeakAreas: "Aucun point faible détecté pour le moment. Continue à t'entraîner !",
+    mistakes: "erreurs",
+    recentAttempts: "Tentatives récentes"
   },
 
   en: {
@@ -160,7 +176,23 @@ export const translations = {
      examfinished: "Exam finished",
      score: "Score",
      success: "Well done!",
-     fail: "Keep practicing!"
+     fail: "Keep practicing!",
+     
+     // 🔥 DASHBOARD
+    dashboardTitle: "Your Performance Dashboard",
+    takeExam: "Take Official Exam",
+    totalExams: "Total Exams",
+    passed: "Passed",
+    average: "Average",
+    bestScore: "Best Score",
+    passRate: "Pass Rate",
+    trend: "Trend",
+    keepPracticing: "Keep practicing to unlock full insights",
+    scoreProgression: "Score Progression",
+    weakAreas: "Weak Areas",
+    noWeakAreas: "No weak areas detected yet. Keep practicing!",
+    mistakes: "mistakes",
+    recentAttempts: "Recent Attempts"
 }
 
   }
