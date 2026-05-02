@@ -3,9 +3,15 @@ import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
 import ProgressChart from "@/components/ProgressChart"
 import Link from "next/link"
+import { getTranslator } from "@/lib/i18n"
 
 export default async function DashboardPage() {
+
   const cookieStore = await cookies()
+
+  // 🌍 LANGUAGE FROM COOKIE
+  const language = cookieStore.get("language")?.value || "en"
+  const t = getTranslator(language)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,7 +45,6 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
-  // 📊 STATS
   const total = attempts?.length || 0
   const passed = attempts?.filter(a => a.passed).length || 0
 
@@ -62,7 +67,6 @@ export default async function DashboardPage() {
   const prev = attempts?.[1]?.percentage || 0
   const trend = last - prev
 
-  // ⚠️ WEAK AREAS
   const { data: weakAreas } = await supabase.rpc(
     "get_user_weak_categories",
     {
@@ -74,46 +78,41 @@ export default async function DashboardPage() {
     <main className="p-8 max-w-5xl mx-auto">
 
       <h1 className="text-3xl font-bold mb-8">
-        Your Performance Dashboard 📊
+        {t("dashboardTitle")} 📊
       </h1>
 
-      {/* 🚀 CTA */}
       <Link href="/official">
         <div className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl mb-6 text-center transition">
-          Take Official Exam 🚀
+          {t("takeExam")} 🚀
         </div>
       </Link>
 
-      {/* 📊 STATS */}
       <div className="grid md:grid-cols-5 gap-6 mb-10">
-        <Card title="Total Exams" value={total} />
-        <Card title="Passed" value={passed} />
-        <Card title="Average" value={`${avg}%`} />
-        <Card title="Best Score" value={`${best}%`} />
-        <Card title="Pass Rate" value={`${passRate}%`} />
+        <Card title={t("totalExams")} value={total} />
+        <Card title={t("passed")} value={passed} />
+        <Card title={t("average")} value={`${avg}%`} />
+        <Card title={t("bestScore")} value={`${best}%`} />
+        <Card title={t("passRate")} value={`${passRate}%`} />
       </div>
 
-      {/* 📉 TREND */}
       {total > 1 && (
         <div className="mb-10">
           <Card
-            title="Trend"
+            title={t("trend")}
             value={`${trend > 0 ? "+" : ""}${trend}%`}
           />
         </div>
       )}
 
-      {/* ⚡ ENGAGEMENT */}
       {total < 3 && (
         <div className="bg-yellow-100 p-4 rounded mb-10 text-center">
-          Keep practicing to unlock full insights 📊
+          {t("keepPracticing")} 📊
         </div>
       )}
 
-      {/* 📈 CHART */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-10">
         <h2 className="text-xl font-semibold mb-4">
-          Score Progression
+          {t("scoreProgression")}
         </h2>
 
         <ProgressChart
@@ -126,15 +125,14 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* ⚠️ WEAK AREAS */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-10">
         <h2 className="text-xl font-semibold mb-4">
-          Weak Areas ⚠️
+          {t("weakAreas")} ⚠️
         </h2>
 
         {(!weakAreas || weakAreas.length === 0) && (
           <p className="text-gray-500">
-            No weak areas detected yet. Keep practicing!
+            {t("noWeakAreas")}
           </p>
         )}
 
@@ -149,17 +147,16 @@ export default async function DashboardPage() {
               </span>
 
               <span className="text-red-600 font-bold">
-                {area.mistakes} mistakes
+                {area.mistakes} {t("mistakes")}
               </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 🕘 RECENT ATTEMPTS */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-4">
-          Recent Attempts
+          {t("recentAttempts")}
         </h2>
 
         <div className="space-y-3">
@@ -197,22 +194,11 @@ export default async function DashboardPage() {
   )
 }
 
-function Card({
-  title,
-  value
-}: {
-  title: string
-  value: any
-}) {
+function Card({ title, value }: { title: string; value: any }) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-center">
-      <div className="text-gray-500 mb-2">
-        {title}
-      </div>
-
-      <div className="text-3xl font-bold text-blue-700">
-        {value}
-      </div>
+      <div className="text-gray-500 mb-2">{title}</div>
+      <div className="text-3xl font-bold text-blue-700">{value}</div>
     </div>
   )
 }
