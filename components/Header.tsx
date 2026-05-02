@@ -106,29 +106,29 @@ export default function Header() {
         {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
 
-          <Link href="/learning" className={linkClass("/learning")}>
-            {t.learning}
+         <Link href="/learning" className={linkClass("/learning")}>
+            {t.learning} 🎓
           </Link>
 
           <Link href="/official" className={linkClass("/official")}>
-            {t.official}
+            {t.official} 🟢
           </Link>
 
           <Link href="/master" className={linkClass("/master")}>
-            {t.master}
+            {t.master} 🔥
           </Link>
 
           {user && (
-            <Link href="/dashboard" className={linkClass("/dashboard")}>
-              {t.dashboard}
-            </Link>
-          )}
+          <Link href="/dashboard" className={linkClass("/dashboard")}>
+            {t.dashboard} 📊
+          </Link>
+        )}
 
-          {isAdmin && (
-            <Link href="/admin" className="text-purple-600 font-semibold">
-              {t.admin}
-            </Link>
-          )}
+            {isAdmin && (
+          <Link href="/admin" className="text-purple-600 font-semibold">
+            {t.admin} ⚙️
+          </Link>
+        )}
 
           {/* LANG */}
           <div className="flex border rounded overflow-hidden text-sm">

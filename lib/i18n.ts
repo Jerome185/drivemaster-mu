@@ -10,6 +10,10 @@ export const translations = {
     next: "Suivant",
     explanation: "Explication",
     learning: "Apprentissage",
+    official: "Examen",
+    master: "Master",
+    dashboard: "Tableau de bord",
+    admin: "Admin",
 
     // 🔥 DASHBOARD
     dashboardTitle: "Ton tableau de performance",
@@ -25,8 +29,7 @@ export const translations = {
     weakAreas: "Points faibles",
     noWeakAreas: "Aucun point faible détecté pour le moment. Continue à t'entraîner !",
     mistakes: "erreurs",
-    recentAttempts: "Tentatives récentes",
-    dashboard: "Tableau de bord"
+    recentAttempts: "Tentatives récentes"
   },
 
   en: {
@@ -40,6 +43,10 @@ export const translations = {
     next: "Next",
     explanation: "Explanation",
     learning: "Learning",
+    official: "Official",
+    master: "Master",
+    dashboard: "Dashboard",
+    admin: "Admin",
 
     // 🔥 DASHBOARD
     dashboardTitle: "Your Performance Dashboard",
@@ -55,8 +62,7 @@ export const translations = {
     weakAreas: "Weak Areas",
     noWeakAreas: "No weak areas detected yet. Keep practicing!",
     mistakes: "mistakes",
-    recentAttempts: "Recent Attempts",
-    dashboard: "Dashboard"
+    recentAttempts: "Recent Attempts"
   }
 }
 
