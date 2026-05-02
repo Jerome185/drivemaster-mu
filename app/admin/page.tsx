@@ -45,41 +45,59 @@ export default function AdminPage(){
   // 📦 LOAD PAYMENTS
   const loadPayments = async()=>{
 
-  const { data, error } = await supabase
-  .from("payments")
-  .select(`
-    *,
-    users (
-      email
-    )
-  `)
-  .eq("status", "pending")
-  .order("created_at", { ascending: false })
+    const { data, error } = await supabase
+      .from("payments")
+      .select(`
+        *,
+        users (
+          email
+        )
+      `)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
 
-  console.log("DATA:", data)
-  console.log("ERROR:", error)
+    console.log("DATA:", data)
+    console.log("ERROR:", error)
 
-  setPayments(data || [])
-  setLoading(false)
-}
+    setPayments(data || [])
+    setLoading(false)
+  }
 
   // ✅ APPROVE
   const approve = async(p:any)=>{
 
+    // 🔥 1. UPDATE PAYMENT
     await supabase
       .from("payments")
       .update({ status:"approved" })
       .eq("id",p.id)
 
+    // 🔥 2. CALCUL DURATION
     let duration = 30
+    let planType = "official"
 
-    if(p.plan === "3_months") duration = 90
-    if(p.plan === "lifetime") duration = 9999
+    if(p.plan === "3_months"){
+      duration = 90
+      planType = "official"
+    }
 
+    if(p.plan === "lifetime"){
+      duration = 9999
+      planType = "master"
+    }
+
+    if(p.plan === "master"){
+      duration = 30
+      planType = "master"
+    }
+
+    // 🔥 3. UPDATE USER (FIX COMPLET)
     await supabase
       .from("users")
       .update({
-        is_premium:true,
+        is_premium: true,
+        premium_status: "active", // ✅ FIX CRITIQUE
+        plan: planType,           // ✅ FIX IMPORTANT
         premium_expires_at: new Date(
           Date.now() + duration*24*60*60*1000
         )

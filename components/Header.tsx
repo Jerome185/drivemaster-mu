@@ -21,26 +21,58 @@ export default function Header() {
   )
 
   const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const isAdmin = user?.email === "jerome.moorghen@gmail.com"
+  // ✅ ADMIN VIA DB
+  const isAdmin = profile?.is_admin === true
 
   useEffect(() => {
-    const getUser = async () => {
+
+    const loadUser = async () => {
       const { data } = await supabase.auth.getUser()
-      setUser(data.user)
+
+      if (data.user) {
+        setUser(data.user)
+
+        const { data: profileData } = await supabase
+          .from("users")
+          .select("is_admin")
+          .eq("id", data.user.id)
+          .single()
+
+        setProfile(profileData)
+      } else {
+        setUser(null)
+        setProfile(null)
+      }
     }
 
-    getUser()
+    loadUser()
 
-    const { data: authListener } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null)
+    const { data: listener } =
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
+
+        if (currentUser) {
+          const { data: profileData } = await supabase
+            .from("users")
+            .select("is_admin")
+            .eq("id", currentUser.id)
+            .single()
+
+          setProfile(profileData)
+        } else {
+          setProfile(null)
+        }
       })
 
     return () => {
-      authListener.subscription.unsubscribe()
+      listener.subscription.unsubscribe()
     }
+
   }, [])
 
   const handleLogout = async () => {
@@ -48,7 +80,6 @@ export default function Header() {
     router.push("/login")
   }
 
-  // 🔥 LANG SWITCH
   const changeLanguage = (lang: "en" | "fr") => {
     setLanguage(lang)
     const path = window.location.pathname
@@ -56,7 +87,6 @@ export default function Header() {
     router.refresh()
   }
 
-  // 🔥 LINK STYLE
   const linkClass = (path: string) =>
     `transition ${
       pathname === path
@@ -69,12 +99,11 @@ export default function Header() {
 
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
-        {/* LOGO */}
         <Link href="/" className="text-xl font-bold text-blue-700">
           DriveMaster MU 🚗
         </Link>
 
-        {/* DESKTOP MENU */}
+        {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
 
           <Link href="/learning" className={linkClass("/learning")}>
@@ -101,14 +130,12 @@ export default function Header() {
             </Link>
           )}
 
-          {/* 🔥 LANGUAGE SWITCH (STYLE PRO) */}
+          {/* LANG */}
           <div className="flex border rounded overflow-hidden text-sm">
             <button
               onClick={() => changeLanguage("en")}
               className={`px-2 py-1 ${
-                language === "en"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100"
+                language === "en" ? "bg-blue-600 text-white" : "bg-gray-100"
               }`}
             >
               EN
@@ -116,28 +143,22 @@ export default function Header() {
             <button
               onClick={() => changeLanguage("fr")}
               className={`px-2 py-1 ${
-                language === "fr"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100"
+                language === "fr" ? "bg-blue-600 text-white" : "bg-gray-100"
               }`}
             >
               FR
             </button>
           </div>
 
-          {/* AUTH */}
           {user ? (
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition"
+              className="bg-red-500 text-white px-3 py-1 rounded"
             >
               {t.logout}
             </button>
           ) : (
-            <Link
-              href="/login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
-            >
+            <Link href="/login" className="bg-blue-600 text-white px-3 py-1 rounded">
               {t.login}
             </Link>
           )}
@@ -152,7 +173,7 @@ export default function Header() {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE */}
       {menuOpen && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t bg-white">
 
@@ -174,35 +195,28 @@ export default function Header() {
             </Link>
           )}
 
-          {/* LANGUAGE MOBILE */}
+          {/* 🔥 ADMIN MOBILE FIX */}
+          {isAdmin && (
+            <Link href="/admin" onClick={() => setMenuOpen(false)}>
+              {t.admin}
+            </Link>
+          )}
+
           <div className="flex gap-2">
-            <button
-              onClick={() => changeLanguage("en")}
-              className="border px-2 py-1 rounded"
-            >
+            <button onClick={() => changeLanguage("en")} className="border px-2 py-1 rounded">
               EN
             </button>
-            <button
-              onClick={() => changeLanguage("fr")}
-              className="border px-2 py-1 rounded"
-            >
+            <button onClick={() => changeLanguage("fr")} className="border px-2 py-1 rounded">
               FR
             </button>
           </div>
 
           {user ? (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-3 py-2 rounded"
-            >
+            <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-2 rounded">
               {t.logout}
             </button>
           ) : (
-            <Link
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              className="bg-blue-600 text-white px-3 py-2 rounded"
-            >
+            <Link href="/login" onClick={() => setMenuOpen(false)} className="bg-blue-600 text-white px-3 py-2 rounded">
               {t.login}
             </Link>
           )}

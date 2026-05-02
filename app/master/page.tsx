@@ -46,10 +46,10 @@ export default function MasterPage() {
     setProfile(profileData)
 
     const isMasterAccess =
-      profileData?.is_premium &&
+      profileData?.premium_status === "active" &&
       profileData?.premium_expires_at &&
       new Date(profileData.premium_expires_at) > new Date() &&
-      profileData?.plan === "master"
+      profileData?.plan?.toLowerCase() === "master"
 
     if(isMasterAccess){
       const { data, error } = await supabase.rpc(

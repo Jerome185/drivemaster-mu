@@ -46,10 +46,10 @@ export default function OfficialPage(){
     setProfile(profileData)
 
     const isOfficialAccess =
-      profileData?.is_premium &&
+      profileData?.premium_status === "active" &&
       profileData?.premium_expires_at &&
       new Date(profileData.premium_expires_at) > new Date() &&
-      (profileData?.plan === "official" || profileData?.plan === "master")
+      ["official", "master"].includes(profileData?.plan?.toLowerCase())
 
     if(isOfficialAccess){
       const { data, error } = await supabase.rpc(
