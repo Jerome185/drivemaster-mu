@@ -80,10 +80,15 @@ export default function Header() {
     router.push("/login")
   }
 
-  const changeLanguage = (lang: "en" | "fr") => {
-    setLanguage(lang)
-    const path = window.location.pathname
-    router.push(`${path}?lang=${lang}`)
+const changeLanguage = (lang: "en" | "fr") => {
+  setLanguage(lang)
+
+  // ✅ AJOUT COOKIE (clé du fix)
+  document.cookie = `language=${lang}; path=/`
+
+  // ✅ garder ton comportement actuel (aucun impact)
+  const path = window.location.pathname
+  router.push(`${path}?lang=${lang}`)
     router.refresh()
   }
 
