@@ -5,7 +5,7 @@ import { createBrowserClient } from "@supabase/ssr"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { useLanguage } from "@/app/contexts/LanguageContext"
-import { translations } from "@/lib/translations"
+import { getTranslator } from "@/lib/i18n"
 
 export default function Header() {
 
@@ -13,8 +13,7 @@ export default function Header() {
   const pathname = usePathname()
 
   const { language, setLanguage } = useLanguage()
-  const t = translations[language]
-
+  const t = getTranslator(language)
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

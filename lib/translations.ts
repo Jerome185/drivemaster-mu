@@ -68,8 +68,8 @@ export const translations = {
     ctaButton: "Accéder aux examens",
     ctaSub: "Accès immédiat après inscription",
 
-    learning: "Learning",
-    dashboard: "Dashboard",
+    learning: "Apprentissage",
+    dashboard: "Tableau de bord",
     admin: "Admin",
     login: "Connexion",
     logout: "Déconnexion",
