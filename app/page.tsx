@@ -112,7 +112,7 @@ export default function Home() {
         </h2>
 
         <button
-          onClick={() => router.push("/premium")}
+          onClick={() => router.push("/learning")}
           className="mt-6 bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
         >
           {t.ctaButton}
