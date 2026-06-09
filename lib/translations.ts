@@ -39,13 +39,13 @@ export const translations = {
 
     // HERO
     title: "Réussis ton permis à Maurice du premier coup",
-    subtitle: "Entraîne-toi avec des questions type examen + explications claires",
-    start: "Commencer maintenant",
-    offer: "🔥 Offre lancement : Rs 999 (places limitées)",
+    subtitle: "Prépare ton examen avec des questions inspirées du permis mauricien",
+    start: "🎯 Faire un test maintenant",
+    offer: "🔥 Accès complet : Rs 999",
 
     feature1: "Français & Anglais",
-    feature2: "Questions réalistes",
-    feature3: "Mobile friendly",
+    feature2: "Questions type examen",
+    feature3: "Révision sur mobile",
 
     // PROBLEM
     problemTitle: "Pourquoi beaucoup échouent ?",
@@ -60,12 +60,12 @@ export const translations = {
     sol1Desc: "Inspirées des vrais tests",
     sol2Title: "Explications simples",
     sol2Desc: "Comprends tes erreurs",
-    sol3Title: "Mobile friendly",
+    sol3Title: "Révision mobile",
     sol3Desc: "Révise partout",
 
     // CTA
     ctaTitle: "Prêt à réussir ton permis ?",
-    ctaButton: "Accéder aux examens",
+    ctaButton: "🚗 Commencer mon entraînement",
     ctaSub: "Accès immédiat après inscription",
 
     learning: "Apprentissage",
@@ -137,13 +137,13 @@ export const translations = {
 
     // HERO
     title: "Pass your driving test in Mauritius on your first try",
-    subtitle: "Practice with real exam questions + clear explanations",
-    start: "Start now",
-    offer: "🔥 Launch offer: Rs 999 (limited spots)",
+    subtitle: "Prepare for your test with questions inspired by the Mauritius driving exam",
+    start: "🎯 Take a test now",
+    offer: "🔥 Full access: Rs 999",
 
     feature1: "French & English",
-    feature2: "Realistic questions",
-    feature3: "Mobile friendly",
+    feature2: "Exam-style questions",
+    feature3: "Study on mobile",
 
     // PROBLEM
     problemTitle: "Why do many fail?",
@@ -158,12 +158,12 @@ export const translations = {
     sol1Desc: "Inspired by real tests",
     sol2Title: "Simple explanations",
     sol2Desc: "Understand your mistakes",
-    sol3Title: "Mobile friendly",
+    sol3Title: "Mobile revision",
     sol3Desc: "Study anywhere",
 
     // CTA
     ctaTitle: "Ready to pass your test?",
-    ctaButton: "Access exams",
+    ctaButton: "🚗 Start Training",
     ctaSub: "Instant access after signup",
 
      learning: "Learning",

@@ -23,10 +23,18 @@ export default function Home() {
           {t.subtitle}
         </p>
 
-        <div className="mt-6 space-y-2 text-sm text-gray-500">
+        <p className="mt-4 text-base font-medium text-gray-800">
+          🚗 Prépare-toi au permis mauricien avec des questions type examen.
+        </p>
+
+        <div className="mt-6 space-y-2 text-sm text-gray-600">
           <p>✅ {t.feature1}</p>
           <p>✅ {t.feature2}</p>
           <p>✅ {t.feature3}</p>
+
+          <p className="pt-3 font-medium text-gray-800">
+            🚗 Plus de questions inspirées de l'examen mauricien
+          </p>
         </div>
 
         <button
@@ -36,9 +44,7 @@ export default function Home() {
           {t.start}
         </button>
 
-        <p className="mt-3 text-sm text-red-500 font-medium">
-          {t.offer}
-        </p>
+        {/* Offre déplacée plus bas */}
       </section>
 
       {/* PROBLEM */}
@@ -86,6 +92,17 @@ export default function Home() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* OFFER */}
+      <section className="py-8 text-center">
+        <p className="text-red-500 font-semibold text-lg">
+          🔥 Offre de lancement : Rs 999
+        </p>
+
+        <p className="text-sm text-gray-500 mt-2">
+          Accès complet aux quiz et corrections détaillées
+        </p>
       </section>
 
       {/* CTA */}
